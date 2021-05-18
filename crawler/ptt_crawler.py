@@ -412,6 +412,7 @@ def crawl_macshop(links, page, sold, iphones, raw_data, data, error_links):
                 raw_data.append([url, str(soup.find("body"))])
             except:
                 error_links.append(url)
+                raw_data.append([url, str(soup.find("body"))])
 
 def main_mobilesales(last_page, max_page, phone_dict):
     raw_data = []
@@ -495,12 +496,10 @@ def main_macshop(last_page, max_page, phone_dict):
 
 if __name__ == '__main__':
     phone_dict = make_phone_dict()
-    print(phone_dict["iPhone"])
     iphone_matches = make_iphone_matches(phone_dict)
-    print(iphone_matches)
-    # last_page = get_last_page("mobilesales")
-    # max_page = Ptt().select_max_page_number("mobilesales") or 20300
-    # main_mobilesales(last_page, max_page, phone_dict)
+    last_page = get_last_page("mobilesales")
+    max_page = Ptt().select_max_page_number("mobilesales") or 20300
+    main_mobilesales(last_page, max_page, phone_dict)
 
     last_page = get_last_page("MacShop")
     max_page = Ptt().select_max_page_number("MacShop") or 18900

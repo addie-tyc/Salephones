@@ -39,6 +39,7 @@ class Ptt():
         db.commit()
         db.close()
 
+
     def select_max_page_number(self, source):
         db = self.db
         cursor = db.cursor(pymysql.cursors.DictCursor)
