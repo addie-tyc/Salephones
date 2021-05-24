@@ -73,7 +73,7 @@ function draw_phone_graph (data) {
 
     var avg_price_30 = {
         x: graph.date, 
-        y: graph.new_price, 
+        y: graph.avg_price_30, 
         line: {color: 'rgb(100,200,150)'}, 
         name: "Second-hand Avg Price <br> within 30 Days", 
         type: "scatter"
@@ -84,33 +84,7 @@ function draw_phone_graph (data) {
             text:`${phone} Price History`,
         },
         width: 648,
-        height: 400,
-        shapes: [
-        {
-            type: 'line',
-            xref: 'paper',
-            x0: 0,
-            y0: graph.new_price[0],
-            x1: 1,
-            y1: graph.new_price[0],
-            line:{
-                color: 'rgb(200,100,150)',
-                width: 2
-            }
-        },
-        {
-            type: 'line',
-            xref: 'paper',
-            x0: 0,
-            y0: graph.avg_price_30[0],
-            x1: 1,
-            y1: graph.avg_price_30[0],
-            line:{
-                color: 'rgb(100,200,150)',
-                width: 2
-            }
-        }
-        ]
+        height: 400
     }
     data = [avg, avg_low, avg_high, new_price, avg_price_30]
     Plotly.newPlot('phone-graph', data, layout);

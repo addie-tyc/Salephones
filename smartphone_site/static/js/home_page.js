@@ -66,8 +66,8 @@ function render_products(data) {
             newProduct.innerHTML = `<div name="title" class="col-5 fs-4 text-center"><a class="link-reset" href=/smartphone-smartprice/detail/${link_title.split(" ").join("-")}/${d.storage.replace("GB", "")}>${d.title}</a></div>
                                     <div name="storage" class="col-3 fs-5 text-center">${d.storage}</div>
                                     <div name=new-price class="col-3 fs-5 text-center">
-                                        <div class="row">新機均價：${d.new_price}</div>
-                                        <div class="row last-row">二手均價：${d.old_price}</div>
+                                        <div class="row">新機均價： ${d.new_price}</div>
+                                        <div class="row last-row">二手均價： ${d.old_price}</div>
                                     </div>`   
             newBrand.appendChild(newProduct);
             }
