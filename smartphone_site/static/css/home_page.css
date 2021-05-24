@@ -1,0 +1,53 @@
+.header {
+  background-color: #2b506e;
+}
+
+h1 {
+  font-size: 48px;
+  color: #fff;
+  margin-left: 5%;
+  padding-top: 26px;
+}
+
+h3 {
+  font-size: 24px;
+  color: #fff;
+  margin-left: 5%;
+  margin-top: 16px;
+  padding-bottom: 30px;
+}
+
+body {
+  background-color: beige;
+}
+
+.buttons {
+  margin-top: 36px;
+}
+
+.products-by-brand {
+  margin-top: 6%; 
+  margin-bottom: 3%; 
+  }
+
+.border-pilled {
+  border: #2b506e 3px solid;
+  border-radius: 25px;
+  margin-right: 1px;
+}
+
+.my-border-bottom {
+  width: 70%;
+  margin: auto;
+  margin-bottom: 26px;
+  border-bottom: #2b506e 1px solid;
+}
+
+.last-row {
+  padding-bottom: 26px;
+}
+
+.link-reset {
+  text-decoration: none;
+  color: #212529;
+}
