@@ -1,20 +1,25 @@
 .header {
   background-color: #2b506e;
+  background-image: url('https://aws-bucket-addie.s3-ap-northeast-1.amazonaws.com/smartphone/smartphones.jpeg');
+  background-size: 800px auto;
+  background-repeat: no-repeat;
+  background-position: right;
+  height: 180px;
 }
+
 
 h1 {
   font-size: 48px;
   color: #fff;
-  margin-left: 5%;
+  margin-left: 4%;
   padding-top: 26px;
 }
 
 h3 {
   font-size: 24px;
   color: #fff;
-  margin-left: 5%;
+  margin-left: 4%;
   margin-top: 16px;
-  padding-bottom: 30px;
 }
 
 body {
