@@ -102,6 +102,9 @@ def make_phone_dict():
                             phone_dict[b].append(phone)
                         phone_dict[b].append(phone)
     phone_dict["Asus"].append("ROG Phone 2")
+    while "ROG Phone II" in phone_dict["Asus"]:
+        phone_dict["Asus"].remove("ROG Phone II")
+
     phone_dict.pop("Galaxy")
 
     url = "https://www.theiphonewiki.com/wiki/List_of_iPhones"
@@ -197,7 +200,7 @@ def crawl_mobilesales(links, page, sold, phone_dict, raw_data, data, error_links
                 storage = None
                 if "rog" in title.lower():
                     for phone in phone_dict["Asus"]:
-                        if phone.lower() in title.lower():
+                        if phone.lower().replace(" ", "") in title.lower().replace(" ", ""):
                             for s in  ["32", "64", "128", "256", "512"]:
                                 if s in title:
                                     storage = int(s)
