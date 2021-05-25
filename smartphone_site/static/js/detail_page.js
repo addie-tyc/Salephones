@@ -6,7 +6,7 @@ function render_products(data) {
     newHead.className = "products"
     newHead.innerHTML = `<div class="row my-border-bottom">
                             <div class="col text-center">價格</div>
-                            <div class="col-4 text-center">配件</div>
+                            <div class="col-5 text-center">配件</div>
                             <div class="col text-center">來源</div>
                             <div class="col text-center">建立日期</div>
                          </div>`
