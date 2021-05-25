@@ -212,6 +212,7 @@ class PttDetailView(GenericAPIView):
         serializer = self.serializer_class(fetch, many=True)
         phone_table = serializer.data
 
+
         fetch = (self.get_queryset()
         .values(date=Cast('created_at', output_field=DateField()))
         .annotate(old_price=Round(Avg('price', output_field=FloatField()), 0), 
@@ -226,17 +227,20 @@ class PttDetailView(GenericAPIView):
         serializer = PttGraphSerializer(fetch, many=True)
         phone_graph = serializer.data
 
+
         fetch = (self.get_queryset()
         .annotate(date=Cast('created_at', output_field=DateField()), 
                   avg_price_30=Round(Avg('price', output_field=FloatField()), 0))
         .filter(title=title, storage=storage, price__gt=1000, date__gt=datetime.now().date()-timedelta(days=30))
         .exclude(storage__isnull=True, price__isnull=True))
 
+
         if len(fetch) > 0:
             avg_price_30 = fetch[0].avg_price_30
         else:
             avg_price_30 = 0
 
+        
         phone_graph_dict = {"date": [], "old_price": [], "min_price": [], "max_price": [],
                             "new_price": [], "avg_price_30": []}
         for d in phone_graph:

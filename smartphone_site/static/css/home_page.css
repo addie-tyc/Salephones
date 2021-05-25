@@ -48,6 +48,10 @@ body {
   border-bottom: #2b506e 1px solid;
 }
 
+a:hover {
+  font-size: 30px;
+}
+
 .last-row {
   padding-bottom: 26px;
 }
