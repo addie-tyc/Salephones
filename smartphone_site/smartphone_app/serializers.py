@@ -34,6 +34,6 @@ class PttGraphSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ptt
-        fields = ('id', 'old_price', 'new_price', 'min_price', 'max_price', 'date')
+        fields = ('id', 'old_price', 'new_price', 'min_price', 'max_price', 'date', 'storage')
 
 

@@ -166,7 +166,8 @@ class PttHomeView(GenericAPIView):
             .annotate(old_price=Round(Avg('price', output_field=FloatField()), 0), 
                       id=Max('id', output_field=IntegerField()))
             .filter(price__gte=1000, new=0, title__in=phones, title__startswith=brand, created_at__gte=datetime.now()-timedelta(days=30))
-            .exclude(storage__isnull=True, price__isnull=True)
+            .exclude(storage__isnull=True)
+            .exclude(price__isnull=True)
             .order_by('title'))
         else:
             fetch = (self.get_queryset()
@@ -175,7 +176,8 @@ class PttHomeView(GenericAPIView):
                       id=Max('id', output_field=IntegerField()),
                       new_price=Min('landtop__price', output_field=IntegerField()))
             .filter(price__gte=1000, new=0, title__in=phones, created_at__gte=datetime.now()-timedelta(days=30))
-            .exclude(storage__isnull=True, price__isnull=True)
+            .exclude(storage__isnull=True)
+            .exclude(price__isnull=True)
             .order_by('title'))
 
         serializer = self.serializer_class(fetch, many=True)
@@ -205,6 +207,7 @@ class PttDetailView(GenericAPIView):
 
         phone = "{} {}GB".format(title, storage)
 
+        # phone_table
         fetch = (self.get_queryset()
         .filter(title=title, storage=storage, sold=0, price__gt=1000)
         .order_by('-created_at'))
@@ -212,7 +215,7 @@ class PttDetailView(GenericAPIView):
         serializer = self.serializer_class(fetch, many=True)
         phone_table = serializer.data
 
-
+        # phone_graph
         fetch = (self.get_queryset()
         .values(date=Cast('created_at', output_field=DateField()))
         .annotate(old_price=Round(Avg('price', output_field=FloatField()), 0), 
@@ -221,26 +224,25 @@ class PttDetailView(GenericAPIView):
                   max_price=Max('price'),
                   id=Max('id', output_field=IntegerField()))
         .filter(title=title, storage=storage, price__gt=1000)
-        .exclude(storage__isnull=True, price__isnull=True)
+        .exclude(storage__isnull=True)
+        .exclude(price__isnull=True)
         .order_by('date'))
 
         serializer = PttGraphSerializer(fetch, many=True)
         phone_graph = serializer.data
 
-
         fetch = (self.get_queryset()
         .annotate(date=Cast('created_at', output_field=DateField()), 
                   avg_price_30=Round(Avg('price', output_field=FloatField()), 0))
         .filter(title=title, storage=storage, price__gt=1000, date__gt=datetime.now().date()-timedelta(days=30))
-        .exclude(storage__isnull=True, price__isnull=True))
-
+        .exclude(storage__isnull=True)
+        .exclude(price__isnull=True))
 
         if len(fetch) > 0:
             avg_price_30 = fetch[0].avg_price_30
         else:
             avg_price_30 = 0
 
-        
         phone_graph_dict = {"date": [], "old_price": [], "min_price": [], "max_price": [],
                             "new_price": [], "avg_price_30": []}
         for d in phone_graph:
@@ -250,5 +252,41 @@ class PttDetailView(GenericAPIView):
             phone_graph_dict["max_price"].append(d["max_price"])
             phone_graph_dict["new_price"].append(d["new_price"])
             phone_graph_dict["avg_price_30"].append(avg_price_30)
+
+        # phone graph of different storage
+        fetch = (self.get_queryset()
+        .values('storage', date=Cast('created_at', output_field=DateField()))
+        .annotate(old_price=Round(Avg('price', output_field=FloatField()), 0), 
+                  new_price=Min('landtop__price', output_field=IntegerField()),
+                  min_price=Min('price'), 
+                  max_price=Max('price'),
+                  id=Max('id', output_field=IntegerField()))
+        .filter(title=title, price__gt=1000)
+        .exclude(storage__isnull=True)
+        .exclude(price__isnull=True)
+        .order_by('storage', 'date'))
+
+        serializer = PttGraphSerializer(fetch, many=True)
+        storage_graph = serializer.data
+
+        # dict_template = {"date": [], "old_price": [], "min_price": [], "max_price": [],
+        #                     "new_price": []}
+        storage_graph_dict = { storage_graph[0]["storage"]: defaultdict(list) }
+        for i in range(len(storage_graph)):
+            if storage_graph[i]["storage"] != storage_graph[i-1]["storage"] and i > 0:
+                storage_graph_dict[ storage_graph[i]["storage"] ] = defaultdict(list)
+            storage_graph_dict[ storage_graph[i]["storage"] ]["date"].append(storage_graph[i]["date"])
+            storage_graph_dict[ storage_graph[i]["storage"] ]["old_price"].append(storage_graph[i]["old_price"])
+            storage_graph_dict[ storage_graph[i]["storage"] ]["min_price"].append(storage_graph[i]["min_price"])
+            storage_graph_dict[ storage_graph[i]["storage"] ]["max_price"].append(storage_graph[i]["max_price"])
+            storage_graph_dict[ storage_graph[i]["storage"] ]["new_price"].append(storage_graph[i]["new_price"])
+        # for d in storage_graph:
+        #     storage_graph_dict["date"].append(d["date"])
+        #     storage_graph_dict["old_price"].append(d["old_price"])
+        #     storage_graph_dict["min_price"].append(d["min_price"])
+        #     storage_graph_dict["max_price"].append(d["max_price"])
+        #     storage_graph_dict["new_price"].append(d["new_price"])
+        #     storage_graph_dict["avg_price_30"].append(avg_price_30)
             
-        return JsonResponse({"phone": phone, "phone_table": phone_table, "phone_graph": phone_graph_dict}, json_dumps_params={'ensure_ascii':False})
+        return JsonResponse({"phone": phone, "phone_table": phone_table,
+                             "phone_graph": phone_graph_dict, "storage_graph": storage_graph_dict}, json_dumps_params={'ensure_ascii':False})
