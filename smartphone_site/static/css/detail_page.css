@@ -26,6 +26,12 @@ body {
   background-color: beige;
 }
 
+h2 {
+  margin-top: 26px;
+  margin-bottom: 26px;
+  margin-left: 5%;
+}
+
 .buttons {
   margin-top: 36px;
 }
@@ -56,13 +62,6 @@ body {
   color: #212529;
 }
 
-.graph {
-  margin-top: 26px;
-  margin-bottom: 26px;
-  margin-right: 4%;
-  margin-left: 1%;
-}
-
 #phone-table {
   width: 45%;
   margin-top: 26px;
@@ -71,12 +70,22 @@ body {
 }
 
 .products {
-  height: 400px;
+  height: 800px;
   overflow: scroll;
 }
 
-h2 {
+.graph {
   margin-top: 26px;
   margin-bottom: 26px;
-  margin-left: 5%;
+  margin-right: 4%;
+  margin-left: 1%;
+}
+
+#storage-link {
+  margin-top: 26px;
+  margin-bottom: 26px;
+}
+
+.links a:hover {
+  font-size: 20px;
 }

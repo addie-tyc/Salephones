@@ -135,6 +135,34 @@ function draw_storage_graph (data) {
     Plotly.newPlot('storage-graph', data, layout);
 }
 
+function add_storage_link(data) {
+    let linkDiv = document.querySelector('#storage-link')
+    var graph = data.storage_graph
+    let title = data.title
+    let storage = data.storage
+    let storages = Object.keys(graph)
+    let newRow = document.createElement('div')
+    newRow.className = "row"
+    for (var i = 0; i < storages.length; i += 1) {
+
+        var newLink = document.createElement('div')
+        newLink.className = "col text-center"
+        s = storages[i]
+
+        if (!(storage.includes(s))) {
+            if (title.includes("+")) {
+                var link_title = title.replace(" ", "-").replace("+", "plus")
+            } else {
+                var link_title = title.replaceAll(" ", "-")
+            }
+            newLink.innerHTML = `<a href="/smartphone-smartprice/detail/${link_title}/${s}" class="link-reset">${title} ${s}GB</a>`
+            newRow.appendChild(newLink)
+        }
+    }
+    linkDiv.appendChild(newRow)
+    
+}
+
 
 url_array = window.location.href.split("/")
 storage = url_array.pop()
@@ -155,5 +183,6 @@ fetch(`/api/v1/detail?title=${title}&storage=${storage}`,{
     draw_phone_graph(data)
     draw_storage_graph(data)
     render_products(data)
+    add_storage_link(data)
     }
 )

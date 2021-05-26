@@ -288,5 +288,5 @@ class PttDetailView(GenericAPIView):
         #     storage_graph_dict["new_price"].append(d["new_price"])
         #     storage_graph_dict["avg_price_30"].append(avg_price_30)
             
-        return JsonResponse({"phone": phone, "phone_table": phone_table,
+        return JsonResponse({"phone": phone, "title":title, "storage": storage, "phone_table": phone_table,
                              "phone_graph": phone_graph_dict, "storage_graph": storage_graph_dict}, json_dumps_params={'ensure_ascii':False})
