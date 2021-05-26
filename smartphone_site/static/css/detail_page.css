@@ -56,8 +56,9 @@ body {
   color: #212529;
 }
 
-#phone-graph {
+.graph {
   margin-top: 26px;
+  margin-bottom: 26px;
   margin-right: 4%;
   margin-left: 1%;
 }
@@ -67,6 +68,11 @@ body {
   margin-top: 26px;
   margin-right: 1%;
   margin-left: 4%;
+}
+
+.products {
+  height: 400px;
+  overflow: scroll;
 }
 
 h2 {
