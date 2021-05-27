@@ -141,6 +141,11 @@ function add_storage_link(data) {
     let title = data.title
     let storage = data.storage
     let storages = Object.keys(graph)
+    if (storages.length > 1) {
+        let newP = document.createElement('p')
+        newP.textContent = "參考更多："
+        linkDiv.appendChild(newP)
+    }
     let newRow = document.createElement('div')
     newRow.className = "row"
     for (var i = 0; i < storages.length; i += 1) {

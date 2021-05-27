@@ -268,10 +268,8 @@ class PttDetailView(GenericAPIView):
 
         serializer = PttGraphSerializer(fetch, many=True)
         storage_graph = serializer.data
-
-        # dict_template = {"date": [], "old_price": [], "min_price": [], "max_price": [],
-        #                     "new_price": []}
         storage_graph_dict = { storage_graph[0]["storage"]: defaultdict(list) }
+        
         for i in range(len(storage_graph)):
             if storage_graph[i]["storage"] != storage_graph[i-1]["storage"] and i > 0:
                 storage_graph_dict[ storage_graph[i]["storage"] ] = defaultdict(list)
@@ -280,13 +278,6 @@ class PttDetailView(GenericAPIView):
             storage_graph_dict[ storage_graph[i]["storage"] ]["min_price"].append(storage_graph[i]["min_price"])
             storage_graph_dict[ storage_graph[i]["storage"] ]["max_price"].append(storage_graph[i]["max_price"])
             storage_graph_dict[ storage_graph[i]["storage"] ]["new_price"].append(storage_graph[i]["new_price"])
-        # for d in storage_graph:
-        #     storage_graph_dict["date"].append(d["date"])
-        #     storage_graph_dict["old_price"].append(d["old_price"])
-        #     storage_graph_dict["min_price"].append(d["min_price"])
-        #     storage_graph_dict["max_price"].append(d["max_price"])
-        #     storage_graph_dict["new_price"].append(d["new_price"])
-        #     storage_graph_dict["avg_price_30"].append(avg_price_30)
             
         return JsonResponse({"phone": phone, "title":title, "storage": storage, "phone_table": phone_table,
                              "phone_graph": phone_graph_dict, "storage_graph": storage_graph_dict}, json_dumps_params={'ensure_ascii':False})
