@@ -47,20 +47,6 @@
   display: none;
 }
 
-header h1 {
-  font-size: 48px;
-  color: #364F7D;
-  margin-left: 4%;
-  padding-top: 26px;
-}
-
-header h3 {
-  font-size: 24px;
-  color: #364F7D;
-  margin-left: 4%;
-  margin-top: 16px;
-}
-
 /* body */
 
 body {

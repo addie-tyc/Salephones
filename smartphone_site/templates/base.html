@@ -6,27 +6,29 @@
         <link href="/static/css/main.css" rel="stylesheet">
         <link rel="icon" type="image/png" href="/static/img/favicon.png" />
     </head>
-    <nav class="navbar">
-        <div class="container">
-            <a href="" class="link-reset">
-                <img src="/static/img/banner.png" border="0" height=180px width=auto>
+    <nav class="navbar navbar-user">
+        {% if user.is_authenticated %}
+            <div class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="https://aws-bucket-addie.s3-ap-northeast-1.amazonaws.com/smartphone/user.png" class="user-icon" id="login-user">
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <li><a class="dropdown-item" href="">Profile</a></li>
+                    <li><a class="dropdown-item" href="">Post a sale</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{% url 'logout' %}">Log out</a></li>
+                </ul>
+            </div>
+            <div>{{ user }}</div>
+        {% else %}
+            <div><a class="text-center" href="{% url 'login' %}"><img src="/static/img/user.png" class="user-icon" id="logout-user"></a></div>
+        {% endif %}
+    </nav>
+    <nav class="navbar navbar-banner">
+        <div class="container banner">
+            <a href="/smartphone-smartprice/home" class="link-reset">
+                <img src="https://aws-bucket-addie.s3-ap-northeast-1.amazonaws.com/smartphone/banner.png" border="0" height=180px width=auto>
             </a>
-            {% if user.is_authenticated %}
-                <div class=navbar-right>{{ user }}</div>
-                <div class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="/static/img/user.png" class="user-icon" id="login-user">
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                      <li><a class="dropdown-item" href="">Profile</a></li>
-                      <li><a class="dropdown-item" href="">Post a sale</a></li>
-                      <li><hr class="dropdown-divider"></li>
-                      <li><a class="dropdown-item" href="{% url 'logout' %}">Log out</a></li>
-                    </ul>
-                </div>
-            {% else %}
-                <div><a class="text-center" href="{% url 'login' %}"><img src="/static/img/user.png" class="user-icon" id="logout-user"></a></div>
-            {% endif %}
         </div>
     </nav>
     <body>

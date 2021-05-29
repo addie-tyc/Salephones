@@ -1,17 +1,29 @@
 /* header */
 
-.navbar {
-  background-color: #364F7D;/* 'https://aws-bucket-addie.s3-ap-northeast-1.amazonaws.com/smartphone/smartphones.jpeg' */
-  height: 180px;
+.navbar-user {
+  background-color: beige;
+  margin: 0;
+  margin-right: 3%;
+  padding: 0;
+  justify-content:flex-end;
+}
+
+.navbar-banner {
   margin: 0;
   padding: 0;
 }
 
-.navbar .container {
+.navbar .banner {
   background-color: #364F7D;
+  background-image: url('https://aws-bucket-addie.s3-ap-northeast-1.amazonaws.com/smartphone/smartphones.jpeg');
+  background-position: 473px;
+  background-repeat: no-repeat;
+  background-size: 967px auto;
   height: 180px;
+  max-width: 1440px;
   margin: 0;
   padding: 0;
+  justify-content:flex-start;
 }
 
 .navbar-nav li{
@@ -19,35 +31,22 @@
 }
 
 .user-icon {
-  height: 48px;
+  height: 36px;
   border-radius: 50%;
 }
 
 #login-user {
-  background-color:aquamarine;
+  background-color:#84A4DC;
 }
 
 #logout-user {
-  background-color:rgb(255, 128, 111);
+  background-color:#888;
 }
 
 .dropdown-toggle::after {
   display: none;
 }
-
-header h1 {
-  font-size: 48px;
-  color: #364F7D;
-  margin-left: 4%;
-  padding-top: 26px;
-}
-
-header h3 {
-  font-size: 24px;
-  color: #364F7D;
-  margin-left: 4%;
-  margin-top: 16px;
-}
+/* body */
 
 body {
   background-color: beige;
@@ -89,6 +88,8 @@ h2 {
   color: #212529;
 }
 
+/* table */
+
 #phone-table {
   width: 45%;
   margin-top: 26px;
@@ -100,6 +101,8 @@ h2 {
   height: 800px;
   overflow: scroll;
 }
+
+/* graph */
 
 .graph {
   margin-top: 26px;
