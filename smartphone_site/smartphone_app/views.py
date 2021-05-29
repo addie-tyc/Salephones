@@ -1,24 +1,61 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from rest_framework.generics import GenericAPIView
 from bs4 import BeautifulSoup
+from django.db.models import Count, FloatField, IntegerField, DateField, Avg, Max, Func, F, Min
+from django.db.models.functions import Cast
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 
 from datetime import datetime, timedelta
 import requests
 from collections import defaultdict
 import time
 
-from smartphone_app.models import Ptt, Landtop
-from smartphone_app.serializers import PttSerializer, LandtopSerializer, PttDetailSerializer, PttGraphSerializer
-from django.db.models import Count, FloatField, IntegerField, DateField, Avg, Max, Func, F, Min
-from django.db.models.functions import Cast
-
+from .models import Ptt, Landtop
+from .serializers import PttSerializer, LandtopSerializer, PttDetailSerializer, PttGraphSerializer
+from .forms import SignUpForm, LoginForm
 
 def home_page(request):
     return render(request, 'home_page.html')
 
 def detail_page(request, title, storage):
     return render(request, 'detail_page.html')
+
+def sign_up(request):
+    if request.user.is_authenticated:
+                return redirect('/smartphone-smartprice/home') 
+    form = SignUpForm()
+    if request.method == "POST":
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            print("success")
+            form.save()
+            redirect('login')
+    context = {
+        'form': form
+    }
+    return render(request, 'registration/signup.html', context)
+
+def login(request):
+    if request.user.is_authenticated:
+        return redirect('/smartphone-smartprice/home') 
+    form = LoginForm()
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = authenticate(username=username, password=password)
+        if user:
+            auth_login(request, user)
+            return redirect('/smartphone-smartprice/home')  #重新導向到首頁
+    context = {
+        'form': form
+    }
+    return render(request, 'registration/login.html', context)
+
+def logout(request):
+    if request.user.is_authenticated:
+        auth_logout(request)
+        return redirect('/smartphone-smartprice/login')
 
 def get_phones():
     url = "https://en.wikipedia.org/wiki/List_of_Android_smartphones"

@@ -1,0 +1,160 @@
+/* header */
+
+.navbar-user {
+  background-color: beige;
+  margin: 0;
+  margin-right: 3%;
+  padding: 0;
+  justify-content:flex-end;
+}
+
+.navbar-banner {
+  margin: 0;
+  padding: 0;
+}
+
+.navbar .banner {
+  background-color: #364F7D;
+  background-image: url('https://aws-bucket-addie.s3-ap-northeast-1.amazonaws.com/smartphone/smartphones.jpeg');
+  background-position: 473px;
+  background-repeat: no-repeat;
+  background-size: 967px auto;
+  height: 180px;
+  max-width: 1440px;
+  margin: 0;
+  padding: 0;
+  justify-content:flex-start;
+}
+
+.navbar-nav li{
+  color: #fff;
+}
+
+.user-icon {
+  height: 36px;
+  border-radius: 50%;
+}
+
+#login-user {
+  background-color:#84A4DC;
+}
+
+#logout-user {
+  background-color:#888;
+}
+
+.dropdown-toggle::after {
+  display: none;
+}
+
+header h1 {
+  font-size: 48px;
+  color: #364F7D;
+  margin-left: 4%;
+  padding-top: 26px;
+}
+
+header h3 {
+  font-size: 24px;
+  color: #364F7D;
+  margin-left: 4%;
+  margin-top: 16px;
+}
+
+/* body */
+
+body {
+  background-color: beige;
+}
+
+/* brands btn */
+
+.buttons {
+  margin-top: 36px;
+}
+
+.border-pilled {
+  border: #364F7D 3px solid;
+  border-radius: 25px;
+  margin-right: 1px;
+}
+
+/* products table */
+
+.products-by-brand {
+  margin-top: 6%; 
+  margin-bottom: 3%; 
+  }
+
+.my-border-bottom {
+  width: 70%;
+  margin: auto;
+  margin-bottom: 26px;
+  border-bottom: #364F7D 1px solid;
+}
+
+.last-row {
+  padding-bottom: 26px;
+}
+
+.link-reset {
+  text-decoration: none;
+  color: #212529;
+}
+
+/* forms */
+.main-form {
+  background-color:#fff;
+  width: 50%;
+  margin: auto;
+  margin-top: 5%;
+  padding-bottom: 26px;
+}
+
+form {
+  margin-top: 16px;
+  background-color:#fff;
+}
+
+.form-control {
+  width: 50%;
+  margin: auto;
+  margin-bottom: 16px;
+}
+
+form label{
+  margin-left: 15%;
+}
+
+.btn-container {
+  text-align: center;
+} 
+
+.submit {
+  border: #364F7D 3px solid;
+  border-radius: 25px;
+  background-color: #364F7D;
+  color:  #fff;
+  margin-top: 16px;
+}
+
+/* form nav */
+.main-form nav{
+  line-height: 24px;
+}
+
+.main-form a {
+  padding: 10px;
+  margin: 10px;
+}
+
+a.current {
+  color: #364F7D;
+  border-bottom: 2px solid #364F7D;
+}
+
+/* error msg */
+.errorlist {
+  text-align: center;
+  color: #f53d25;
+}

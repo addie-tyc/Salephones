@@ -2,7 +2,7 @@ function filter_brand(brand) {
     let products = $('.products-by-brand')
     let button = $(`#${brand}-button`)
 
-    if (button.css('backgroundColor') === "rgb(43, 80, 110)") {
+    if (button.css('backgroundColor') === "rgb(54, 79, 125)") {
         for (var i = 0; i < products.length; i += 1) {
             products[i].style = ''
             button.css("backgroundColor", "beige")
@@ -12,7 +12,7 @@ function filter_brand(brand) {
         for (var i = 0; i < products.length; i += 1) {
             if (products[i].id === brand) {
                 products[i].style = ''
-                button.css("backgroundColor", "#2b506e")
+                button.css("backgroundColor", "#364F7D")
                 button.css("color", "#fff")
             } else {
                 products[i].style = 'display:none'
@@ -75,9 +75,6 @@ function render_products(data) {
         productsDiv.appendChild(newBrand)
         }
 }
-
-
-
 
 fetch("/api/v1/home",{
     method: 'GET',

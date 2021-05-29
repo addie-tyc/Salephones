@@ -25,6 +25,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('smartphone-smartprice/home', views.home_page),
     path('smartphone-smartprice/detail/<str:title>/<int:storage>', views.detail_page),
+    path('smartphone-smartprice/signup', views.sign_up, name="signup"),
+    path('smartphone-smartprice/login', views.login, name="login"),
+    path('smartphone-smartprice/logout', views.logout, name="logout" ),
     path('api/v1/home', views.PttHomeView.as_view()),
-    path('api/v1/detail', views.PttDetailView.as_view())
+    path('api/v1/detail', views.PttDetailView.as_view()),
+    path('smartphone-smartprice/login', views.login, name="login"),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
