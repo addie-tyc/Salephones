@@ -17,6 +17,9 @@ import os
 
 load_dotenv()
 secret_key = os.getenv('SECRET_KEY')
+sql_host = os.getenv('SQL_HOST')
+sql_user = os.getenv('SQL_USER')
+sql_pwd = os.getenv('SQL_PWD')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -85,9 +88,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'smartphone',
-        'USER': 'newuser',
-        'PASSWORD': '0987_Poiu',
-        'HOST': 'database-mysql.cngks69vy9ai.us-east-2.rds.amazonaws.com',
+        'USER': sql_user,
+        'PASSWORD': sql_pwd,
+        'HOST': sql_host,
         'PORT': '3306',
         'OPTIONS': {
             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
@@ -148,4 +151,6 @@ REST_FRAMEWORK = {
     ],
     'UNICODE_JSON': True
 }
+
+LOGIN_REDIRECT_URL = 'smartphone-smartprice/home'
 
