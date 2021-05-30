@@ -3,7 +3,7 @@
 .navbar-user {
   background-color: beige;
   margin: 0;
-  margin-right: 3%;
+  margin-right: 5%;
   padding: 0;
   justify-content:flex-end;
 }
@@ -18,9 +18,10 @@
   background-image: url('https://aws-bucket-addie.s3-ap-northeast-1.amazonaws.com/smartphone/smartphones.jpeg');
   background-position: 473px;
   background-repeat: no-repeat;
-  background-size: 967px auto;
+  background-size: 80% auto;
   height: 180px;
-  max-width: 1440px;
+  width: 100%;
+  max-width: 2000px;
   margin: 0;
   padding: 0;
   justify-content:flex-start;
@@ -94,6 +95,7 @@ body {
   width: 50%;
   margin: auto;
   margin-top: 5%;
+  margin-bottom: 5%;
   padding-bottom: 26px;
 }
 
@@ -143,4 +145,24 @@ a.current {
 .errorlist {
   text-align: center;
   color: #f53d25;
+}
+
+/* success msg */
+
+.success {
+  list-style: none;
+  text-align: center;
+  width: 50%;
+  margin: auto;
+  margin-top: 26px;
+  background-color: mediumaquamarine;
+}
+
+.error {
+  list-style: none;
+  text-align: center;
+  width: 50%;
+  margin: auto;
+  margin-top: 26px;
+  background-color: rgb(250, 100, 100);
 }
