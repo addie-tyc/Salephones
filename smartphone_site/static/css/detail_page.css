@@ -97,10 +97,24 @@ h2 {
   margin-left: 4%;
 }
 
-.products {
-  height: 800px;
+/* tbody {
+  height: 1400px;
   overflow: scroll;
+} */
+
+thead {
+  font-size: 20px
 }
+
+thead tr th:hover {
+  cursor: pointer; 
+}
+
+tbody tr:hover { 
+  background: #84A4DC;
+  cursor: pointer; 
+}
+
 
 /* graph */
 

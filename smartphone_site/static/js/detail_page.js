@@ -1,20 +1,27 @@
 function render_products(data) {
-    let productsDiv = document.querySelector('.products')
+    let productsDiv = document.querySelector('tbody')
 
     let products = data.phone_table
 
     for (var i = 0; i < products.length; i += 1) {
-        let newPost = document.createElement('div')
+        let newPost = document.createElement('tr')
         let d = products[i]
-        newPost.className = "product"
-        newPost.innerHTML = `<a href="${d.link}" class="link-reset">
-                                <div class="row my-border-bottom justify-content-md-center">
-                                    <div name="price" class="col text-center">${d.price}</div>
-                                    <div name="box" class="col-5 ">${d.box}</div>
-                                    <div name="source" class="col text-center">${d.source}</div>
-                                    <div name="created_at" class="col text-center">${d.created_at.replace('T', ' ').replace('Z', '')}</div>
-                                </div>
-                             </a>`
+        newPost.className = "product row my-border-bottom justify-content-md-center"
+        newPost.setAttribute('onclick', `document.location = '${d.link}';`);
+        newPost.innerHTML = `
+                                <td name="price" class="col text-center">${d.price}</td>
+                                <td name="box" class="col-5">${d.box}</td>
+                                <td name="source" class="col text-center">${d.source}</td>
+                                <td name="created_at" class="col text-center">${d.created_at.replace('T', ' ').replace('Z', '')}</td>
+                             `
+                            //  <a href="${d.link}" class="link-reset">
+                            //     <div class="row my-border-bottom justify-content-md-center">
+                            //         <div name="price" class="col text-center">${d.price}</div>
+                            //         <div name="box" class="col-5 ">${d.box}</div>
+                            //         <div name="source" class="col text-center">${d.source}</div>
+                            //         <div name="created_at" class="col text-center">${d.created_at.replace('T', ' ').replace('Z', '')}</div>
+                            //     </div>
+                            //  </a>
         productsDiv.appendChild(newPost)
         }
 }
