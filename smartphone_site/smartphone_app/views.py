@@ -1,19 +1,25 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
+from rest_framework.views import APIView
 from rest_framework.generics import GenericAPIView
 from bs4 import BeautifulSoup
 from django.db.models import Count, FloatField, IntegerField, DateField, Avg, Max, Func, F, Min
 from django.db.models.functions import Cast
+from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from django.contrib.auth.models import User
+import boto3
 
 from datetime import datetime, timedelta
 import requests
 from collections import defaultdict
 import time
+import os
 
 from .models import Ptt, Landtop
 from .serializers import PttSerializer, LandtopSerializer, PttDetailSerializer, PttGraphSerializer
-from .forms import SignUpForm, LoginForm
+from .forms import SignUpForm, LoginForm, SaleForm
+from django.conf import settings
 
 def home_page(request):
     return render(request, 'home_page.html')
@@ -21,41 +27,61 @@ def home_page(request):
 def detail_page(request, title, storage):
     return render(request, 'detail_page.html')
 
-def sign_up(request):
-    if request.user.is_authenticated:
-                return redirect('/smartphone-smartprice/home') 
-    form = SignUpForm()
-    if request.method == "POST":
+class SignUpView(GenericAPIView):
+    queryset = User.objects.all()
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            return redirect('/smartphone-smartprice/home') 
+        form = SignUpForm()
+        context = {
+        'form': form
+        }
+        return render(request, 'registration/signup.html', context)
+    
+    def post(self, request):
         form = SignUpForm(request.POST)
         if form.is_valid():
-            print("success")
             form.save()
+            messages.success(request, 'Signed up successfully!')
             redirect('login')
-    context = {
-        'form': form
-    }
-    return render(request, 'registration/signup.html', context)
+        else:
+            messages.error(request, 'Something went wrong. Please try again!')
+        return redirect('/smartphone-smartprice/signup') 
 
-def login(request):
-    if request.user.is_authenticated:
-        return redirect('/smartphone-smartprice/home') 
-    form = LoginForm()
-    if request.method == "POST":
+
+class LoginView(GenericAPIView):
+    queryset = User.objects.all()
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            return redirect('/smartphone-smartprice/home') 
+        form = LoginForm()
+        context = {
+        'form': form
+        }
+        return render(request, 'registration/login.html', context)
+    
+    def post(self, request):
+        form = LoginForm(request.POST)
         username = request.POST.get("username")
         password = request.POST.get("password")
         user = authenticate(username=username, password=password)
         if user:
             auth_login(request, user)
             return redirect('/smartphone-smartprice/home')  #重新導向到首頁
-    context = {
-        'form': form
-    }
-    return render(request, 'registration/login.html', context)
+        else:
+            messages.error(request, 'Something went wrong. Please try again!')
+        return redirect('/smartphone-smartprice/login') 
 
-def logout(request):
-    if request.user.is_authenticated:
-        auth_logout(request)
+class LogoutView(GenericAPIView):
+    queryset = User.objects.all()
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            auth_logout(request)
         return redirect('/smartphone-smartprice/login')
+
 
 def get_phones():
     url = "https://en.wikipedia.org/wiki/List_of_Android_smartphones"
@@ -318,3 +344,51 @@ class PttDetailView(GenericAPIView):
             
         return JsonResponse({"phone": phone, "title":title, "storage": storage, "phone_table": phone_table,
                              "phone_graph": phone_graph_dict, "storage_graph": storage_graph_dict}, json_dumps_params={'ensure_ascii':False})
+
+
+class SaleView(GenericAPIView):
+    queryset = Ptt.objects.all()
+
+    def get(self, request):
+        if not request.user.is_authenticated:
+            return redirect('/smartphone-smartprice/home') 
+        form = SaleForm()
+        context = {
+        'form': form
+        }
+        return render(request, 'registration/sale.html', context)
+
+    def post(self, request):
+        form = SaleForm(request.POST)
+        current_user = request.user
+        print(form.errors)
+        if form.is_valid():
+            sale = form.save(commit=False)
+            # default value: sold, account, created_at, source
+            sale.account = current_user.username
+            sale.email = current_user.email
+            sale.created_at = datetime.now().replace(microsecond=0)
+
+            # images = []
+            # files = request.FILES.getlist("images")
+            # s3 = boto3.resource('s3', aws_access_key_id=settings.AWS_ACCESS_KEY, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
+            # s3_bucket = s3.Bucket("aws-bucket-addie")
+
+            # # make main_image's path
+            # root_path = os.path.dirname(os.path.abspath(__file__)) # get current path
+            # upload_folder = os.path.join(root_path, "smartphone-uploads") # gen upload path
+            # for i in range(len(files)):
+            #     filename = current_user.username + "_" + str(sale.created_at.date()) +f"_{i}"+ ".jpg"
+            #     filepath = os.path.join(upload_folder, filename)
+            #     # files[i].save(filepath)
+            #     f_key_name = f"smartphone/{filename}"
+            #     s3_bucket.upload_file(files[i], f_key_name, ExtraArgs={'ContentType': 'image/png', 'ACL':'public-read'})
+            #     image_url = "https://aws-bucket-addie.s3.amazonaws.com/" + f_key_name
+            #     images.append(image_url)
+            # sale.images = ",".join(images)
+                
+            sale.save()
+            messages.success(request, 'Add Product successfully!')
+        else:
+            messages.error(request, 'Something went wrong. Please try again!')
+        return redirect('/smartphone-smartprice/sale') 
