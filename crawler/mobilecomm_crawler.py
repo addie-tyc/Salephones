@@ -101,7 +101,7 @@ def get_phones():
                             phone_list.append(phone)
                         phone_list.append(phone)
     phone_list.append("Asus ROG Phone 2")
-    extend = ["note20ultra", "s20ultra", "s21ultra", "s20+", "s21+", "s20", "s21"]
+    extend = ["Note 20 Ultra", "S20 Ultra", "S21 Ultra", "S20+", "S21+", "S20", "S21"]
     for s in extend:
         phone_list.append(s)
 
@@ -124,7 +124,7 @@ def get_phones():
     phone_set = set()
     for p in phone_list:
         phone_set.add(p)
-    phone_list = sorted(list(phone_set))
+    phone_list = sorted(list(phone_set), key=lambda x: len(x), reverse=True)
     phone_list.remove("Asus ROG Phone II")
     return phone_list
 
@@ -165,7 +165,7 @@ def sample_analyze_sentiment(text_content):
 def crawl_comm(links):
     data = []
     for link in links:
-        url = "https://www.ptt.cc" + link[1]
+        url = "https://www.ptt.cc" + link[2]
         ua = UserAgent()
         fakeua = ua.random
         headers = {"Origin": "https://www.ptt.cc",
@@ -181,13 +181,13 @@ def crawl_comm(links):
             else:
                 body = str(main).split('--')[0].split('</span></div>')[-1].replace(" ","").replace("\n", "。")
         doc, sentences = sample_analyze_sentiment(body)
-        d = {"title": link[0].text.strip(), "link": link[1], "page": link[2], "doc": doc, "sentences": sentences}
+        d = {"title": link[0], "arc_title": link[1], "link": link[2], "page": link[3], "doc": doc, "sentences": sentences}
         data.append(d)
     return data
 
 def crawl_comm_pages():
     
-    for page in range(51, 100):
+    for page in range(20, 100):
 
         ua = UserAgent()
         fakeua = ua.random
@@ -203,7 +203,7 @@ def crawl_comm_pages():
         index_soup = BeautifulSoup(resp.text, "html.parser")
         keywords = ["換", "vs", "v.s", "vs.", "v.s."]
         title = index_soup.findAll("div", class_="title")
-
+        extend = ["Note 20 Ultra", "S20 Ultra", "S21 Ultra", "S20+", "S21+", "S20", "S21"]
         links = []
         for t in title:
             if any(keyword in t.text for keyword in keywords):
@@ -212,7 +212,9 @@ def crawl_comm_pages():
                 for p in phone_list:
                     if p.replace(" ", "").lower() in t.text.replace(" ", "").lower():
                         print(p, t)
-                        links.append( (t, t.find("a")["href"], page) )
+                        if p in extend:
+                            p = "Samsung Galaxy " + p
+                        links.append( (p, t.text.strip(), t.find("a")["href"], page) )
                         break
                         break
         
