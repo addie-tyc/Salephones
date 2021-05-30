@@ -137,15 +137,17 @@ class Ptt(models.Model):
     new = models.IntegerField(blank=True, null=True)
     sold = models.IntegerField(blank=True, null=True)
     account = models.CharField(max_length=255, blank=True, null=True)
+    email = models.CharField(max_length=255, blank=True, null=True)
     box = models.CharField(max_length=255, blank=True, null=True)
-    link = models.CharField(unique=True, max_length=255, blank=True, null=True)
+    link = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(blank=True, null=True)
     source = models.CharField(max_length=255, blank=True, null=True)
     page_number = models.IntegerField(blank=True, null=True)
+    images = models.TextField(blank=True, null=True)
     landtop = models.ManyToManyField(Landtop, through='PttLandtop', through_fields=('ptt', 'landtop'))
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'ptt'
 
 class PttLandtop(models.Model):
