@@ -36,4 +36,10 @@ class PttGraphSerializer(serializers.ModelSerializer):
         model = Ptt
         fields = ('id', 'old_price', 'new_price', 'min_price', 'max_price', 'date', 'storage')
 
+class CommentsSerializer(serializers.Serializer):
+
+   title = serializers.CharField()
+   doc = serializers.CharField()
+   sentences = serializers.CharField()
+
 
