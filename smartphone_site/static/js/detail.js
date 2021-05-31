@@ -8,6 +8,9 @@ function render_products(data) {
         let newPost = document.createElement('tr')
         let d = products[i]
         newPost.className = "product row my-border-bottom justify-content-md-center"
+        if (d.source === "native") {
+            d.link = `/smartphone-smartprice/post/${d.id}` 
+        }
         newPost.setAttribute('onclick', `document.location = '${d.link}';`);
         newPost.innerHTML = `
                                 <td name="price" class="col text-center">${d.price}</td>

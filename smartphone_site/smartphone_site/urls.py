@@ -30,6 +30,7 @@ urlpatterns = [
     path('smartphone-smartprice/login', views.LoginView.as_view(), name="login"),
     path('smartphone-smartprice/logout', views.LogoutView.as_view(), name="logout"),
     path('smartphone-smartprice/sale', views.SaleView.as_view(), name="sale"),
+    path('smartphone-smartprice/post/<int:id>', views.PostView.as_view()),
     path('api/v1/home', views.PttHomeView.as_view()),
     path('api/v1/table', views.PttTableView.as_view()),
     path('api/v1/price-graph', views.PttPriceGraphView.as_view()),

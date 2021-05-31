@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from rest_framework.views import APIView
 from rest_framework.generics import GenericAPIView
@@ -479,3 +479,23 @@ class ProfileView(GenericAPIView):
                 "sale_post": sale_post}
         return JsonResponse(data, json_dumps_params={'ensure_ascii':False}, safe=False)
 
+
+class PostView(GenericAPIView):
+    queryset = Ptt.objects.all()
+    serializer_class = ProfileSerializer
+
+    def get(self, request, id):
+        if not request.user.is_authenticated:
+            return redirect('/smartphone-smartprice/login')
+        id = request.path.split('/')[-1]
+        print(id)
+        fetch = get_object_or_404(Ptt, pk=id)
+        # fetch = self.queryset.all().get(pk=id)
+        serializer = self.serializer_class(fetch)
+        data = serializer.data
+        data["images"] = data["images"].split(",")
+        context = {
+        'data': data
+        }
+        return render(request, 'post.html', context)
+        # return JsonResponse(data, json_dumps_params={'ensure_ascii':False}, safe=False)

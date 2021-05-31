@@ -11,14 +11,17 @@ function render_post(data) {
     let postDiv = document.querySelector('#sale-post')
     let sale_post =  data.sale_post
     for (var i = 0; i < sale_post.length; i += 1) {
-        var newDiv = document.createElement('div')
-        newDiv.className = "row post v-center"
+        var newA = document.createElement('a')
+        newA.className = "link-reset"
+        newA.href = `/smartphone-smartprice/post/${sale_post[i].id}`
         var img = sale_post[i]["images"].split(',')[0]
-        newDiv.innerHTML = `<div name="image" class="col-5 text-center"><img src=${img}></div>
-                            <div name="title" class="col text-center">${sale_post[i].title}</div>
-                            <div name="price" class="col text-center">${sale_post[i].price}</div>
-                            <div name="created_at" class="col text-center">${sale_post[i].created_at.replace('T', ' ').replace('Z', '')}</div>`
-        postDiv.appendChild(newDiv)
+        newA.innerHTML = `<div class="row post v-center">
+                                <div name="image" class="col-5 text-center"><img src=${img}></div>
+                                <div name="title" class="col text-center">${sale_post[i].title}</div>
+                                <div name="price" class="col text-center">${sale_post[i].price}</div>
+                                <div name="created_at" class="col text-center">${sale_post[i].created_at.replace('T', ' ').replace('Z', '')}</div>
+                            </div>`
+        postDiv.appendChild(newA)
     }
 }
 
