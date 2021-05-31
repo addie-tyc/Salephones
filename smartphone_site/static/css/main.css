@@ -68,14 +68,22 @@ body {
 
 /* products table */
 
+.products {
+  width: 50%;
+  margin: auto;  
+}
+
 .products-by-brand {
   margin-top: 6%; 
   margin-bottom: 3%; 
   }
 
+.my-border-bottom:hover{
+  background:#84A4DC;
+}
+
 .my-border-bottom {
-  width: 70%;
-  margin: auto;
+  width: 100%;
   margin-bottom: 26px;
   border-bottom: #364F7D 1px solid;
 }

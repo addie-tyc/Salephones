@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<link href="/static/css/profile.css" rel="stylesheet">
+<body>
+  <div class="main-form container">
+    <nav class="row">
+      <a href="/smartphone-smartprice/profile" class="current link-reset col text-center">會員資料</a>
+    </nav>
+    <div class="container text-center" id="profile">
+    </div>
+    <hr>
+    <div class="container text-center" id="sale-post">
+      <h6>你上架的手機</h6>
+      <div class="row">
+        <div name="image" class="col-5 text-center"></div>
+        <div name="title" class="col text-center">商品名稱</div>
+        <div name="price" class="col text-center">價格</div>
+        <div name="created_at" class="col text-center">上架時間</div>
+      </div>
+    </div>
+  </div>
+</body>
+<script src="/static/js/profile.js"></script>
+{% endblock  %}

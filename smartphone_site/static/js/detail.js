@@ -15,14 +15,6 @@ function render_products(data) {
                                 <td name="source" class="col text-center">${d.source}</td>
                                 <td name="created_at" class="col text-center">${d.created_at.replace('T', ' ').replace('Z', '')}</td>
                              `
-                            //  <a href="${d.link}" class="link-reset">
-                            //     <div class="row my-border-bottom justify-content-md-center">
-                            //         <div name="price" class="col text-center">${d.price}</div>
-                            //         <div name="box" class="col-5 ">${d.box}</div>
-                            //         <div name="source" class="col text-center">${d.source}</div>
-                            //         <div name="created_at" class="col text-center">${d.created_at.replace('T', ' ').replace('Z', '')}</div>
-                            //     </div>
-                            //  </a>
         productsDiv.appendChild(newPost)
         }
 }
@@ -181,12 +173,33 @@ function add_storage_link(data) {
 function render_comments(data) {
     let commDiv = document.querySelector('#comments')
     let keys = Object.keys(data)
-    var newH5 = document.createElement('h5')
-    newH5.textContent = "網友評價情緒："
-    commDiv.appendChild(newH5)
-    var newH6 = document.createElement('h6')
-    newH6.textContent = `平均情緒分數：${data[keys[0]]["score"]} (-1 ~ +1)`
-    commDiv.appendChild(newH6)
+    if (data["doc"]["score"] >= 0) {
+        var col = 'rgb(200,100,150)' 
+    } else {
+        var col = 'rgb(0,100,150)' 
+    }
+    var senti = [{
+        type: 'bar',
+        x: [data["doc"]["score"]],
+        y: ["score"],
+        line: {color: col}, 
+        width: [1],
+        orientation: 'h'
+      }];
+    var layout = {
+        title: "網友評價情緒",
+        width: 648,
+        height: 200,
+        xaxis: {
+            range: [-0.05, 0.05],
+            },
+        yaxis:{visible: false
+        }
+    }
+    Plotly.newPlot('comments', senti, layout);
+    // var newH6 = document.createElement('h6')
+    // newH6.textContent = `平均情緒分數：${data[keys[0]]["score"]} (-1 ~ +1)`
+    // commDiv.appendChild(newH6)
 
     
     for (var i = 1; i < 3; i += 1) {
@@ -212,7 +225,7 @@ storage = url_array.pop()
 title = url_array.pop().split("-").join("+")
 
 
-fetch(`/api/v1/detail?title=${title}&storage=${storage}`,{
+fetch(`/api/v1/table?title=${title}&storage=${storage}`,{
     method: 'GET',
 })
 .then(response => {
@@ -223,9 +236,31 @@ fetch(`/api/v1/detail?title=${title}&storage=${storage}`,{
     let title = document.createElement('h2')
     title.innerHTML = data.phone
     document.querySelector('#phone-title').appendChild(title)
-    draw_phone_graph(data)
-    draw_storage_graph(data)
     render_products(data)
+    }
+)
+
+fetch(`/api/v1/price-graph?title=${title}&storage=${storage}`,{
+    method: 'GET',
+})
+.then(response => {
+    // console.log(response.json())
+    return response.json()
+})
+.then(data => {
+    draw_phone_graph(data)
+    }
+)
+
+fetch(`/api/v1/storage-graph?title=${title}&storage=${storage}`,{
+    method: 'GET',
+})
+.then(response => {
+    // console.log(response.json())
+    return response.json()
+})
+.then(data => {
+    draw_storage_graph(data)
     add_storage_link(data)
     }
 )
