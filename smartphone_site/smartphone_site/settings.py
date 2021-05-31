@@ -166,6 +166,3 @@ LOGIN_REDIRECT_URL = 'smartphone-smartprice/home'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # media directory in the root directory
 MEDIA_URL = '/media/'
 
-# AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY")
-# AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_KEY")
-

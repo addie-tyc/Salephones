@@ -8,6 +8,8 @@ from django.db.models.functions import Cast
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.models import User
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
 import boto3
 
 
@@ -20,6 +22,7 @@ import os
 from .models import Ptt, Landtop, db
 from .serializers import PttSerializer, LandtopSerializer, PttDetailSerializer, PttGraphSerializer
 from .forms import SignUpForm, LoginForm, SaleForm
+import env
 
 
 def home_page(request):
@@ -368,31 +371,27 @@ class SaleView(GenericAPIView):
             # default value: sold, account, created_at, source
             sale.account = current_user.username
             sale.email = current_user.email
-            sale.created_at = datetime.now().replace(microsecond=0)
+            sale.created_at = datetime.utcnow().replace(microsecond=0) + timedelta(hours=8)
 
-            # images = []
-            # files = request.FILES.getlist("images")
-            # s3 = boto3.resource('s3', aws_access_key_id=settings.AWS_ACCESS_KEY, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
-            # s3_bucket = s3.Bucket("aws-bucket-addie")
+            images = []
+            files = request.FILES.getlist("images")
+            s3 = boto3.resource('s3', aws_access_key_id=env.AWS_ACCESS_KEY, aws_secret_access_key=env.AWS_SECRET_ACCESS_KEY)
+            s3_bucket = s3.Bucket("aws-bucket-addie")
 
             # create a new instance of FileSystemStorage
             fs = FileSystemStorage()
-            file = fs.save(request_file.name, request_file)
-            # the fileurl variable now contains the url to the file. This can be used to serve the file when needed.
-            fileurl = fs.url(file)
+            for i in range(len(files)):
+                upload_folder = "smartphone-images/"
+                filename = upload_folder + current_user.username + "_" + str(int(datetime.timestamp(sale.created_at))) +f"_{i}.jpg"
+                f= fs.save(filename, files[i])
+                # the fileurl variable now contains the url to the file. This can be used to serve the file when needed.
+                fileurl = fs.url(f)
+                upload_path = str(settings.BASE_DIR) + fileurl
+                s3_bucket.upload_file(upload_path, filename, ExtraArgs={'ContentType': 'image/png', 'ACL':'public-read'})
+                image_url = "https://aws-bucket-addie.s3.amazonaws.com/" + filename
+                images.append(image_url)
 
-            # # make main_image's path
-            # root_path = os.path.dirname(os.path.abspath(__file__)) # get current path
-            # upload_folder = os.path.join(root_path, "smartphone-uploads") # gen upload path
-            # for i in range(len(files)):
-            #     filename = current_user.username + "_" + str(sale.created_at.date()) +f"_{i}"+ ".jpg"
-            #     filepath = os.path.join(upload_folder, filename)
-            #     # files[i].save(filepath)
-            #     f_key_name = f"smartphone/{filename}"
-            #     s3_bucket.upload_file(files[i], f_key_name, ExtraArgs={'ContentType': 'image/png', 'ACL':'public-read'})
-            #     image_url = "https://aws-bucket-addie.s3.amazonaws.com/" + f_key_name
-            #     images.append(image_url)
-            # sale.images = ",".join(images)
+            sale.images = ",".join(images)
                 
             sale.save()
             messages.success(request, 'Add Product successfully!')
