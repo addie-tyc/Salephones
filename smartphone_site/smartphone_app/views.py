@@ -231,27 +231,16 @@ class PttHomeView(GenericAPIView):
 
     def get(self, request, *args, **krgs):
         start = time.time()
-        brand = request.GET.get('brand')
         phones = get_phones()
-        if brand:
-            fetch = (self.get_queryset()
-            .values('title', 'storage')
-            .annotate(old_price=Round(Avg('price', output_field=FloatField()), 0), 
-                      id=Max('id', output_field=IntegerField()))
-            .filter(price__gte=1000, new=0, title__in=phones, title__startswith=brand, created_at__gte=datetime.now()-timedelta(days=30))
-            .exclude(storage__isnull=True)
-            .exclude(price__isnull=True)
-            .order_by('title'))
-        else:
-            fetch = (self.get_queryset()
-            .values('title', 'storage')
-            .annotate(old_price=Round(Avg('price', output_field=FloatField()), 0), 
-                      id=Max('id', output_field=IntegerField()),
-                      new_price=Min('landtop__price', output_field=IntegerField()))
-            .filter(price__gte=1000, new=0, title__in=phones, created_at__gte=datetime.now()-timedelta(days=30))
-            .exclude(storage__isnull=True)
-            .exclude(price__isnull=True)
-            .order_by('title'))
+        fetch = (self.get_queryset()
+        .values('title', 'storage')
+        .annotate(old_price=Round(Avg('price', output_field=FloatField()), 0), 
+                    id=Max('id', output_field=IntegerField()),
+                    new_price=Min('landtop__price', output_field=IntegerField()))
+        .filter(price__gte=1000, new=0, title__in=phones, created_at__gte=datetime.now()-timedelta(days=30))
+        .exclude(storage__isnull=True)
+        .exclude(price__isnull=True)
+        .order_by('title'))
 
         serializer = self.serializer_class(fetch, many=True)
         data = serializer.data
@@ -473,10 +462,11 @@ class CommentsView(GenericAPIView):
 
 
 class ProfileView(GenericAPIView):
+
     queryset = Ptt.objects.all()
     serializer_class = ProfileSerializer
 
-    def get(self, request, *args, **krgs):
+    def get(self, request):
         if not request.user.is_authenticated:
             return redirect('/smartphone-smartprice/login')
         current_user = request.user
@@ -488,3 +478,4 @@ class ProfileView(GenericAPIView):
         data = {"user_info": {"username": username, "email": email},
                 "sale_post": sale_post}
         return JsonResponse(data, json_dumps_params={'ensure_ascii':False}, safe=False)
+
