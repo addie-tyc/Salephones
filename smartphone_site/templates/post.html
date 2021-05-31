@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<link href="/static/css/post.css" rel="stylesheet">
+<body>
+  <div class="main-form container">
+    <div class="container" id="sale-post">
+      <h4>賣家：{{ data.account }} ({{ data.email }})</h4>
+      <h4>販售商品：{{ data.title }} {{ data.storage }}GB</h4>
+      <h4>價格：{{ data.price}}</h4>
+      <div class="row m-left">全新 或 已使用：
+        {% if data.new == 1%}
+            全新
+        {% else %}
+            已使用
+        {% endif %}
+      </div>
+      <div class="row m-left">
+        盒裝內容：{{ data.box }}
+      </div>
+      <div class="row m-left">
+        物品狀況：{{ data.status }}
+      </div>
+      {% for img in data.images %}
+        <div class="row text-center"><img src="{{ img }}"></div>
+      {% endfor %}
+    </div>
+  </div>
+</body>
+<script src="/static/js/profile.js"></script>
+{% endblock  %}

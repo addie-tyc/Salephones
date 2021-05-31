@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from rest_framework.views import APIView
 from rest_framework.generics import GenericAPIView
@@ -9,6 +9,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
+from rest_framework import serializers
 from django.conf import settings
 import boto3
 
@@ -20,7 +21,7 @@ import time
 import os
 
 from .models import Ptt, Landtop, db
-from .serializers import PttSerializer, LandtopSerializer, PttDetailSerializer, PttGraphSerializer
+from .serializers import PttSerializer, LandtopSerializer, PttDetailSerializer, PttGraphSerializer, ProfileSerializer
 from .forms import SignUpForm, LoginForm, SaleForm
 import env
 
@@ -32,7 +33,9 @@ def home_page(request):
 def detail_page(request, title, storage):
     return render(request, 'detail.html')
 
-def profile_page(request, title, storage):
+def profile_page(request):
+    if not request.user.is_authenticated:
+        return redirect('/smartphone-smartprice/login') 
     return render(request, 'profile.html')
 
 class SignUpView(GenericAPIView):
@@ -228,27 +231,16 @@ class PttHomeView(GenericAPIView):
 
     def get(self, request, *args, **krgs):
         start = time.time()
-        brand = request.GET.get('brand')
         phones = get_phones()
-        if brand:
-            fetch = (self.get_queryset()
-            .values('title', 'storage')
-            .annotate(old_price=Round(Avg('price', output_field=FloatField()), 0), 
-                      id=Max('id', output_field=IntegerField()))
-            .filter(price__gte=1000, new=0, title__in=phones, title__startswith=brand, created_at__gte=datetime.now()-timedelta(days=30))
-            .exclude(storage__isnull=True)
-            .exclude(price__isnull=True)
-            .order_by('title'))
-        else:
-            fetch = (self.get_queryset()
-            .values('title', 'storage')
-            .annotate(old_price=Round(Avg('price', output_field=FloatField()), 0), 
-                      id=Max('id', output_field=IntegerField()),
-                      new_price=Min('landtop__price', output_field=IntegerField()))
-            .filter(price__gte=1000, new=0, title__in=phones, created_at__gte=datetime.now()-timedelta(days=30))
-            .exclude(storage__isnull=True)
-            .exclude(price__isnull=True)
-            .order_by('title'))
+        fetch = (self.get_queryset()
+        .values('title', 'storage')
+        .annotate(old_price=Round(Avg('price', output_field=FloatField()), 0), 
+                    id=Max('id', output_field=IntegerField()),
+                    new_price=Min('landtop__price', output_field=IntegerField()))
+        .filter(price__gte=1000, new=0, title__in=phones, created_at__gte=datetime.now()-timedelta(days=30))
+        .exclude(storage__isnull=True)
+        .exclude(price__isnull=True)
+        .order_by('title'))
 
         serializer = self.serializer_class(fetch, many=True)
         data = serializer.data
@@ -264,7 +256,7 @@ class PttHomeView(GenericAPIView):
         return JsonResponse({"products": result}, json_dumps_params={'ensure_ascii':False})
 
 
-class PttDetailView(GenericAPIView):
+class PttTableView(GenericAPIView):
 
     queryset = Ptt.objects.all().prefetch_related("landtop")
     serializer_class = PttDetailSerializer
@@ -284,6 +276,21 @@ class PttDetailView(GenericAPIView):
 
         serializer = self.serializer_class(fetch, many=True)
         phone_table = serializer.data
+            
+        return JsonResponse({"phone": phone, "title":title, "storage": storage, "phone_table": phone_table}, json_dumps_params={'ensure_ascii':False})
+
+class PttPriceGraphView(GenericAPIView):
+
+    queryset = Ptt.objects.all().prefetch_related("landtop")
+    serializer_class = PttDetailSerializer
+
+    def get(self, request, *args, **krgs):
+        title = request.GET.get('title')
+        if "plus" in title:
+            title = title.replace("plus", "+")
+        storage = request.GET.get('storage')
+
+        phone = "{} {}GB".format(title, storage)
 
         # phone_graph
         fetch = (self.get_queryset()
@@ -322,6 +329,22 @@ class PttDetailView(GenericAPIView):
             phone_graph_dict["max_price"].append(d["max_price"])
             phone_graph_dict["new_price"].append(d["new_price"])
             phone_graph_dict["avg_price_30"].append(avg_price_30)
+        
+ 
+        return JsonResponse({"phone": phone, "title":title, "storage": storage, "phone_graph": phone_graph_dict}, json_dumps_params={'ensure_ascii':False})
+
+class PttStorageGraphView(GenericAPIView):
+
+    queryset = Ptt.objects.all().prefetch_related("landtop")
+    serializer_class = PttDetailSerializer
+
+    def get(self, request, *args, **krgs):
+        title = request.GET.get('title')
+        if "plus" in title:
+            title = title.replace("plus", "+")
+        storage = request.GET.get('storage')
+
+        phone = "{} {}GB".format(title, storage)
 
         # phone graph of different storage
         fetch = (self.get_queryset()
@@ -349,8 +372,7 @@ class PttDetailView(GenericAPIView):
             storage_graph_dict[ storage_graph[i]["storage"] ]["max_price"].append(storage_graph[i]["max_price"])
             storage_graph_dict[ storage_graph[i]["storage"] ]["new_price"].append(storage_graph[i]["new_price"])
             
-        return JsonResponse({"phone": phone, "title":title, "storage": storage, "phone_table": phone_table,
-                             "phone_graph": phone_graph_dict, "storage_graph": storage_graph_dict}, json_dumps_params={'ensure_ascii':False})
+        return JsonResponse({"phone": phone, "title":title, "storage": storage, "storage_graph": storage_graph_dict}, json_dumps_params={'ensure_ascii':False})
 
 
 class SaleView(GenericAPIView):
@@ -440,36 +462,40 @@ class CommentsView(GenericAPIView):
 
 
 class ProfileView(GenericAPIView):
+
     queryset = Ptt.objects.all()
+    serializer_class = ProfileSerializer
 
-    def get(self, request, *args, **krgs):
-        title = request.GET.get('title')
-        db_coll = db["sentiment"]
-        fetch = [sample for sample in db_coll.find({ "title" : title })]
-        doc_score = [ d["doc"]["score"] for d in fetch ]
-        doc_mag = [ d["doc"]["magnitude"] for d in fetch ]
-        doc = {"score": round(sum(doc_score)/len(doc_score), 2), "magnitude": round(sum(doc_mag)/len(doc_mag), 2)}
-        sentences = []
-        for d in fetch:
-            sentences.extend(d["sentences"])
-
-        for d in sentences:
-            temp = []
-            if "<" in d["content"]:
-                lst = d["content"].split("<")
-                for i in lst:
-                    if ">" not in i:
-                        temp.append(i)
-                d["content"] = "，".join(temp)
+    def get(self, request):
+        if not request.user.is_authenticated:
+            return redirect('/smartphone-smartprice/login')
+        current_user = request.user
+        fetch = self.queryset.all().filter(account=current_user.username, source="native")
+        serializer = self.serializer_class(fetch, many=True)
+        sale_post = serializer.data
+        username = current_user.username
+        email = current_user.email
+        data = {"user_info": {"username": username, "email": email},
+                "sale_post": sale_post}
+        return JsonResponse(data, json_dumps_params={'ensure_ascii':False}, safe=False)
 
 
-        sentences = sorted([ (d["content"], d["score"], d["magnitude"]) for d in sentences 
-                              if abs(d["score"]) >= 0.5 and abs(d["magnitude"]) >= 0.5 and len(d["content"]) > 5 ],
-                    key=lambda x: x[1], reverse=True)
-        goods = [i[0] for i in sentences if i[1] > 0]
-        bads = [i[0] for i in sentences if i[1] < 0]
-        arc_title = [ d["arc_title"] for d in fetch ]
-        link = [ "https://www.ptt.cc/"+d["link"] for d in fetch ]
-        data = {"doc":doc, "goods": goods, "bads": bads, "arc_title": arc_title, "link": link}
-        
-        return JsonResponse(data, json_dumps_params={'ensure_ascii':False})
+class PostView(GenericAPIView):
+    queryset = Ptt.objects.all()
+    serializer_class = ProfileSerializer
+
+    def get(self, request, id):
+        if not request.user.is_authenticated:
+            return redirect('/smartphone-smartprice/login')
+        id = request.path.split('/')[-1]
+        print(id)
+        fetch = get_object_or_404(Ptt, pk=id)
+        # fetch = self.queryset.all().get(pk=id)
+        serializer = self.serializer_class(fetch)
+        data = serializer.data
+        data["images"] = data["images"].split(",")
+        context = {
+        'data': data
+        }
+        return render(request, 'post.html', context)
+        # return JsonResponse(data, json_dumps_params={'ensure_ascii':False}, safe=False)

@@ -149,6 +149,7 @@ class Ptt(models.Model):
     source = models.CharField(max_length=255, blank=True, null=True)
     page_number = models.IntegerField(blank=True, null=True)
     images = models.TextField(blank=True, null=True)
+    status = models.TextField(blank=True, null=True)
     landtop = models.ManyToManyField(Landtop, through='PttLandtop', through_fields=('ptt', 'landtop'))
 
     class Meta:

@@ -153,6 +153,7 @@ class SaleForm(forms.ModelForm):
     account = forms.CharField(widget=forms.HiddenInput(attrs={'class': 'form-control'}), initial="0", required=True)
     email = forms.CharField(widget=forms.HiddenInput(attrs={'class': 'form-control'}), initial="0", required=True)
     box = forms.CharField(label="盒裝內容", widget=forms.TextInput(attrs={'class': 'form-control'}), required=True)
+    status = forms.CharField(label="物品狀況", widget=forms.Textarea(attrs={'class': 'form-control'}), required=True)
     created_at = forms.CharField(widget=forms.HiddenInput(attrs={'class': 'form-control'}), initial=datetime.now(), required=True)
     source = forms.CharField(widget=forms.HiddenInput(attrs={'class': 'form-control'}), initial="native", required=True)
     images = forms.FileField(label="商品照片（最多 4 張）", 
@@ -164,5 +165,5 @@ class SaleForm(forms.ModelForm):
     class Meta:
         model = Ptt
         fields = ('title', 'storage', 'price', 'new', 'sold', 
-                  'account',  'box', 'created_at', 'source', 'images')
+                  'account',  'box', 'status', 'created_at', 'source', 'images')
                   # default value: sold, account, created_at, source

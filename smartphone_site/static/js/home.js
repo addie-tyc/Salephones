@@ -48,7 +48,7 @@ function render_products(data) {
 
         newBrand.id = `${brand}`
         newBrand.className = "products-by-brand"
-        newBrand.innerHTML = `<div class="row justify-content-md-center">
+        newBrand.innerHTML = `<div class="row">
                                 <h2 class="col-3">${brand}</h2>
                                 <div class="col-3"></div>
                                 <div class="col-3"></div>
@@ -56,18 +56,21 @@ function render_products(data) {
         var lst = products[brand]
         for (var j in lst) {
             d = lst[j]
-            let newProduct = document.createElement('div')
-            newProduct.className = `row my-border-bottom justify-content-md-center`
+            let newProduct = document.createElement('a')
             if (d.title.includes("+")) {
                 var link_title = d.title.replace("+", "plus")
             } else {
                 var link_title = d.title
             }
-            newProduct.innerHTML = `<div name="title" class="col-5 fs-4 text-center"><a class="link-reset" href=/smartphone-smartprice/detail/${link_title.split(" ").join("-")}/${d.storage.replace("GB", "")}>${d.title}</a></div>
-                                    <div name="storage" class="col-3 fs-5 text-center">${d.storage}</div>
-                                    <div name=new-price class="col-3 fs-5 text-center">
-                                        <div class="row">新機均價： ${d.new_price}</div>
-                                        <div class="row last-row">二手均價： ${d.old_price}</div>
+            newProduct.className = "link-reset"
+            newProduct.href = `/smartphone-smartprice/detail/${link_title.split(" ").join("-")}/${d.storage.replace("GB", "")}`
+            newProduct.innerHTML = `<div class="row my-border-bottom d-flex justify-content-center">
+                                        <div name="title" class="col-5 fs-4 text-center">${d.title}</div>
+                                        <div name="storage" class="col-3 fs-5 text-center">${d.storage}</div>
+                                        <div name=new-price class="col-3 fs-5 text-center">
+                                            <div class="row">新機均價： ${d.new_price}</div>
+                                            <div class="row last-row">二手均價： ${d.old_price}</div>
+                                        </div>
                                     </div>`   
             newBrand.appendChild(newProduct);
             }
