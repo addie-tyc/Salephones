@@ -24,12 +24,16 @@ from .serializers import PttSerializer, LandtopSerializer, PttDetailSerializer, 
 from .forms import SignUpForm, LoginForm, SaleForm
 import env
 
+# pages
 
 def home_page(request):
-    return render(request, 'home_page.html')
+    return render(request, 'home.html')
 
 def detail_page(request, title, storage):
-    return render(request, 'detail_page.html')
+    return render(request, 'detail.html')
+
+def profile_page(request, title, storage):
+    return render(request, 'profile.html')
 
 class SignUpView(GenericAPIView):
     queryset = User.objects.all()
@@ -85,7 +89,6 @@ class LogoutView(GenericAPIView):
         if request.user.is_authenticated:
             auth_logout(request)
         return redirect('/smartphone-smartprice/login')
-
 
 def get_phones():
     url = "https://en.wikipedia.org/wiki/List_of_Android_smartphones"
@@ -399,7 +402,44 @@ class SaleView(GenericAPIView):
             messages.error(request, 'Something went wrong. Please try again!')
         return redirect('/smartphone-smartprice/sale') 
 
+
 class CommentsView(GenericAPIView):
+    queryset = Ptt.objects.all()
+
+    def get(self, request, *args, **krgs):
+        title = request.GET.get('title')
+        db_coll = db["sentiment"]
+        fetch = [sample for sample in db_coll.find({ "title" : title })]
+        doc_score = [ d["doc"]["score"] for d in fetch ]
+        doc_mag = [ d["doc"]["magnitude"] for d in fetch ]
+        doc = {"score": round(sum(doc_score)/len(doc_score), 2), "magnitude": round(sum(doc_mag)/len(doc_mag), 2)}
+        sentences = []
+        for d in fetch:
+            sentences.extend(d["sentences"])
+
+        for d in sentences:
+            temp = []
+            if "<" in d["content"]:
+                lst = d["content"].split("<")
+                for i in lst:
+                    if ">" not in i:
+                        temp.append(i)
+                d["content"] = "，".join(temp)
+
+
+        sentences = sorted([ (d["content"], d["score"], d["magnitude"]) for d in sentences 
+                              if abs(d["score"]) >= 0.5 and abs(d["magnitude"]) >= 0.5 and len(d["content"]) > 5 ],
+                    key=lambda x: x[1], reverse=True)
+        goods = [i[0] for i in sentences if i[1] > 0]
+        bads = [i[0] for i in sentences if i[1] < 0]
+        arc_title = [ d["arc_title"] for d in fetch ]
+        link = [ "https://www.ptt.cc/"+d["link"] for d in fetch ]
+        data = {"doc":doc, "goods": goods, "bads": bads, "arc_title": arc_title, "link": link}
+        
+        return JsonResponse(data, json_dumps_params={'ensure_ascii':False})
+
+
+class ProfileView(GenericAPIView):
     queryset = Ptt.objects.all()
 
     def get(self, request, *args, **krgs):
