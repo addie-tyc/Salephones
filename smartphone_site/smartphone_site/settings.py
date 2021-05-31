@@ -15,8 +15,7 @@ from dotenv import load_dotenv
 
 import os
 
-load_dotenv()
-secret_key = os.getenv('SECRET_KEY')
+import env
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = secret_key
+SECRET_KEY = env.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -85,14 +84,23 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'smartphone',
-        'USER': 'newuser',
-        'PASSWORD': '0987_Poiu',
-        'HOST': 'database-mysql.cngks69vy9ai.us-east-2.rds.amazonaws.com',
+        'USER': env.SQL_USER,
+        'PASSWORD': env.SQL_PWD,
+        'HOST': env.SQL_HOST,
         'PORT': '3306',
         'OPTIONS': {
             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
         }
     }
+#     ,
+#     'comments' : {
+#         'ENGINE' : 'django_mongodb_engine',
+#         'NAME' : 'my_database',
+#         'USER': mongo_user,
+#         'PASSWORD': mongo_pwd,
+#         'HOST': mongo_host,
+#         'PORT': '27017',
+#    }
 }
 
 
@@ -143,9 +151,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ],
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    # ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
     'UNICODE_JSON': True
 }
+
+LOGIN_REDIRECT_URL = 'smartphone-smartprice/home'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # media directory in the root directory
+MEDIA_URL = '/media/'
 

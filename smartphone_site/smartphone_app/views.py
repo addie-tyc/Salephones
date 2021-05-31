@@ -1,17 +1,28 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
+from rest_framework.views import APIView
 from rest_framework.generics import GenericAPIView
 from bs4 import BeautifulSoup
+from django.db.models import Count, FloatField, IntegerField, DateField, Avg, Max, Func, F, Min
+from django.db.models.functions import Cast
+from django.contrib import messages
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from django.contrib.auth.models import User
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
+import boto3
+
 
 from datetime import datetime, timedelta
 import requests
 from collections import defaultdict
 import time
+import os
 
-from smartphone_app.models import Ptt, Landtop
-from smartphone_app.serializers import PttSerializer, LandtopSerializer, PttDetailSerializer, PttGraphSerializer
-from django.db.models import Count, FloatField, IntegerField, DateField, Avg, Max, Func, F, Min
-from django.db.models.functions import Cast
+from .models import Ptt, Landtop, db
+from .serializers import PttSerializer, LandtopSerializer, PttDetailSerializer, PttGraphSerializer
+from .forms import SignUpForm, LoginForm, SaleForm
+import env
 
 
 def home_page(request):
@@ -19,6 +30,62 @@ def home_page(request):
 
 def detail_page(request, title, storage):
     return render(request, 'detail_page.html')
+
+class SignUpView(GenericAPIView):
+    queryset = User.objects.all()
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            return redirect('/smartphone-smartprice/home') 
+        form = SignUpForm()
+        context = {
+        'form': form
+        }
+        return render(request, 'registration/signup.html', context)
+    
+    def post(self, request):
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Signed up successfully!')
+            redirect('login')
+        else:
+            messages.error(request, 'Something went wrong. Please try again!')
+        return redirect('/smartphone-smartprice/signup') 
+
+
+class LoginView(GenericAPIView):
+    queryset = User.objects.all()
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            return redirect('/smartphone-smartprice/home') 
+        form = LoginForm()
+        context = {
+        'form': form
+        }
+        return render(request, 'registration/login.html', context)
+    
+    def post(self, request):
+        form = LoginForm(request.POST)
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = authenticate(username=username, password=password)
+        if user:
+            auth_login(request, user)
+            return redirect('/smartphone-smartprice/home')  #重新導向到首頁
+        else:
+            messages.error(request, 'Something went wrong. Please try again!')
+        return redirect('/smartphone-smartprice/login') 
+
+class LogoutView(GenericAPIView):
+    queryset = User.objects.all()
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            auth_logout(request)
+        return redirect('/smartphone-smartprice/login')
+
 
 def get_phones():
     url = "https://en.wikipedia.org/wiki/List_of_Android_smartphones"
@@ -268,10 +335,8 @@ class PttDetailView(GenericAPIView):
 
         serializer = PttGraphSerializer(fetch, many=True)
         storage_graph = serializer.data
-
-        # dict_template = {"date": [], "old_price": [], "min_price": [], "max_price": [],
-        #                     "new_price": []}
         storage_graph_dict = { storage_graph[0]["storage"]: defaultdict(list) }
+        
         for i in range(len(storage_graph)):
             if storage_graph[i]["storage"] != storage_graph[i-1]["storage"] and i > 0:
                 storage_graph_dict[ storage_graph[i]["storage"] ] = defaultdict(list)
@@ -280,13 +345,91 @@ class PttDetailView(GenericAPIView):
             storage_graph_dict[ storage_graph[i]["storage"] ]["min_price"].append(storage_graph[i]["min_price"])
             storage_graph_dict[ storage_graph[i]["storage"] ]["max_price"].append(storage_graph[i]["max_price"])
             storage_graph_dict[ storage_graph[i]["storage"] ]["new_price"].append(storage_graph[i]["new_price"])
-        # for d in storage_graph:
-        #     storage_graph_dict["date"].append(d["date"])
-        #     storage_graph_dict["old_price"].append(d["old_price"])
-        #     storage_graph_dict["min_price"].append(d["min_price"])
-        #     storage_graph_dict["max_price"].append(d["max_price"])
-        #     storage_graph_dict["new_price"].append(d["new_price"])
-        #     storage_graph_dict["avg_price_30"].append(avg_price_30)
             
-        return JsonResponse({"phone": phone, "phone_table": phone_table,
+        return JsonResponse({"phone": phone, "title":title, "storage": storage, "phone_table": phone_table,
                              "phone_graph": phone_graph_dict, "storage_graph": storage_graph_dict}, json_dumps_params={'ensure_ascii':False})
+
+
+class SaleView(GenericAPIView):
+    queryset = Ptt.objects.all()
+
+    def get(self, request):
+        if not request.user.is_authenticated:
+            return redirect('/smartphone-smartprice/home') 
+        form = SaleForm()
+        context = {
+        'form': form
+        }
+        return render(request, 'registration/sale.html', context)
+
+    def post(self, request):
+        form = SaleForm(request.POST)
+        current_user = request.user
+        print(form.errors)
+        if form.is_valid():
+            sale = form.save(commit=False)
+            # default value: sold, account, created_at, source
+            sale.account = current_user.username
+            sale.email = current_user.email
+            sale.created_at = datetime.utcnow().replace(microsecond=0) + timedelta(hours=8)
+
+            images = []
+            files = request.FILES.getlist("images")
+            s3 = boto3.resource('s3', aws_access_key_id=env.AWS_ACCESS_KEY, aws_secret_access_key=env.AWS_SECRET_ACCESS_KEY)
+            s3_bucket = s3.Bucket("aws-bucket-addie")
+
+            # create a new instance of FileSystemStorage
+            fs = FileSystemStorage()
+            for i in range(len(files)):
+                upload_folder = "smartphone-images/"
+                filename = upload_folder + current_user.username + "_" + str(int(datetime.timestamp(sale.created_at))) +f"_{i}.jpg"
+                f= fs.save(filename, files[i])
+                # the fileurl variable now contains the url to the file. This can be used to serve the file when needed.
+                fileurl = fs.url(f)
+                upload_path = str(settings.BASE_DIR) + fileurl
+                s3_bucket.upload_file(upload_path, filename, ExtraArgs={'ContentType': 'image/png', 'ACL':'public-read'})
+                image_url = "https://aws-bucket-addie.s3.amazonaws.com/" + filename
+                images.append(image_url)
+
+            sale.images = ",".join(images)
+                
+            sale.save()
+            messages.success(request, 'Add Product successfully!')
+        else:
+            messages.error(request, 'Something went wrong. Please try again!')
+        return redirect('/smartphone-smartprice/sale') 
+
+class CommentsView(GenericAPIView):
+    queryset = Ptt.objects.all()
+
+    def get(self, request, *args, **krgs):
+        title = request.GET.get('title')
+        db_coll = db["sentiment"]
+        fetch = [sample for sample in db_coll.find({ "title" : title })]
+        doc_score = [ d["doc"]["score"] for d in fetch ]
+        doc_mag = [ d["doc"]["magnitude"] for d in fetch ]
+        doc = {"score": round(sum(doc_score)/len(doc_score), 2), "magnitude": round(sum(doc_mag)/len(doc_mag), 2)}
+        sentences = []
+        for d in fetch:
+            sentences.extend(d["sentences"])
+
+        for d in sentences:
+            temp = []
+            if "<" in d["content"]:
+                lst = d["content"].split("<")
+                for i in lst:
+                    if ">" not in i:
+                        temp.append(i)
+                d["content"] = "，".join(temp)
+
+
+        sentences = sorted([ (d["content"], d["score"], d["magnitude"]) for d in sentences 
+                              if abs(d["score"]) >= 0.5 and abs(d["magnitude"]) >= 0.5 and len(d["content"]) > 5 ],
+                    key=lambda x: x[1], reverse=True)
+        goods = [i[0] for i in sentences if i[1] > 0]
+        bads = [i[0] for i in sentences if i[1] < 0]
+        arc_title = [ d["arc_title"] for d in fetch ]
+        link = [ "https://www.ptt.cc/"+d["link"] for d in fetch ]
+        data = {"doc":doc, "goods": goods, "bads": bads, "arc_title": arc_title, "link": link}
+        
+        return JsonResponse(data, json_dumps_params={'ensure_ascii':False})

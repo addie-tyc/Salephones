@@ -1,29 +1,61 @@
-.header {
-  background-color: #2b506e;
+/* header */
+
+.navbar-user {
+  background-color: beige;
+  margin: 0;
+  margin-right: 3%;
+  padding: 0;
+  justify-content:flex-end;
+}
+
+.navbar-banner {
+  margin: 0;
+  padding: 0;
+}
+
+.navbar .banner {
+  background-color: #364F7D;
   background-image: url('https://aws-bucket-addie.s3-ap-northeast-1.amazonaws.com/smartphone/smartphones.jpeg');
-  background-size: 800px auto;
+  background-position: 473px;
   background-repeat: no-repeat;
-  background-position: right;
+  background-size: 967px auto;
   height: 180px;
+  max-width: 1440px;
+  margin: 0;
+  padding: 0;
+  justify-content:flex-start;
 }
 
-
-h1 {
-  font-size: 48px;
+.navbar-nav li{
   color: #fff;
-  margin-left: 4%;
-  padding-top: 26px;
 }
 
-h3 {
-  font-size: 24px;
-  color: #fff;
-  margin-left: 4%;
-  margin-top: 16px;
+.user-icon {
+  height: 36px;
+  border-radius: 50%;
 }
+
+#login-user {
+  background-color:#84A4DC;
+}
+
+#logout-user {
+  background-color:#888;
+}
+
+.dropdown-toggle::after {
+  display: none;
+}
+/* body */
 
 body {
   background-color: beige;
+}
+
+h2 {
+  margin-top: 26px;
+  margin-bottom: 26px;
+  margin-left: 5%;
 }
 
 .buttons {
@@ -56,6 +88,40 @@ body {
   color: #212529;
 }
 
+/* table */
+
+#phone-table-div {
+  width: 45%;
+  margin-top: 26px;
+  margin-right: 1%;
+  margin-left: 4%;
+  height: 1400px;
+  overflow: scroll;
+}
+
+/* #phone-table {
+  width: 45%;
+  margin-top: 26px;
+  margin-right: 1%;
+  margin-left: 4%;
+} */
+
+thead {
+  font-size: 20px
+}
+
+thead tr th:hover {
+  cursor: pointer; 
+}
+
+tbody tr:hover { 
+  background: #84A4DC;
+  cursor: pointer; 
+}
+
+
+/* graph */
+
 .graph {
   margin-top: 26px;
   margin-bottom: 26px;
@@ -63,20 +129,29 @@ body {
   margin-left: 1%;
 }
 
-#phone-table {
-  width: 45%;
-  margin-top: 26px;
-  margin-right: 1%;
-  margin-left: 4%;
-}
-
-.products {
-  height: 400px;
-  overflow: scroll;
-}
-
-h2 {
+#storage-link {
   margin-top: 26px;
   margin-bottom: 26px;
-  margin-left: 5%;
+}
+
+.links a:hover {
+  font-size: 20px;
+}
+
+/* comments */
+#comments {
+  margin-top: 20px;
+  margin-bottom: 26px;
+  margin-right: 4%;
+  margin-left: 1%;
+  width: 648px;
+}
+
+ul {
+  padding-left: 0;
+  margin-top: 20px;
+}
+
+ul li {
+  word-break: break-all;
 }

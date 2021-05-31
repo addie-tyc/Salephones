@@ -1,20 +1,28 @@
 function render_products(data) {
-    let productsDiv = document.querySelector('.products')
+    
+    let productsDiv = document.querySelector('tbody')
 
     let products = data.phone_table
 
     for (var i = 0; i < products.length; i += 1) {
-        let newPost = document.createElement('div')
+        let newPost = document.createElement('tr')
         let d = products[i]
-        newPost.className = "product"
-        newPost.innerHTML = `<a href="${d.link}" class="link-reset">
-                                <div class="row my-border-bottom justify-content-md-center">
-                                    <div name="price" class="col text-center">${d.price}</div>
-                                    <div name="box" class="col-5 ">${d.box}</div>
-                                    <div name="source" class="col text-center">${d.source}</div>
-                                    <div name="created_at" class="col text-center">${d.created_at.replace('T', ' ').replace('Z', '')}</div>
-                                </div>
-                             </a>`
+        newPost.className = "product row my-border-bottom justify-content-md-center"
+        newPost.setAttribute('onclick', `document.location = '${d.link}';`);
+        newPost.innerHTML = `
+                                <td name="price" class="col text-center">${d.price}</td>
+                                <td name="box" class="col-5">${d.box}</td>
+                                <td name="source" class="col text-center">${d.source}</td>
+                                <td name="created_at" class="col text-center">${d.created_at.replace('T', ' ').replace('Z', '')}</td>
+                             `
+                            //  <a href="${d.link}" class="link-reset">
+                            //     <div class="row my-border-bottom justify-content-md-center">
+                            //         <div name="price" class="col text-center">${d.price}</div>
+                            //         <div name="box" class="col-5 ">${d.box}</div>
+                            //         <div name="source" class="col text-center">${d.source}</div>
+                            //         <div name="created_at" class="col text-center">${d.created_at.replace('T', ' ').replace('Z', '')}</div>
+                            //     </div>
+                            //  </a>
         productsDiv.appendChild(newPost)
         }
 }
@@ -135,6 +143,69 @@ function draw_storage_graph (data) {
     Plotly.newPlot('storage-graph', data, layout);
 }
 
+function add_storage_link(data) {
+    let linkDiv = document.querySelector('#storage-link')
+    var graph = data.storage_graph
+    let title = data.title
+    let storage = data.storage
+    let storages = Object.keys(graph)
+    if (storages.length > 1) {
+        let newP = document.createElement('p')
+        newP.textContent = "參考更多："
+        linkDiv.appendChild(newP)
+    }
+    let newRow = document.createElement('div')
+    newRow.className = "row"
+    for (var i = 0; i < storages.length; i += 1) {
+
+        var newLink = document.createElement('div')
+        newLink.className = "col text-center"
+        s = storages[i]
+
+        if (!(storage.includes(s))) {
+            if (title.includes("+")) {
+                var link_title = title.replace(" ", "-").replace("+", "plus")
+            } else {
+                var link_title = title.replaceAll(" ", "-")
+            }
+            newLink.innerHTML = `<a href="/smartphone-smartprice/detail/${link_title}/${s}" class="link-reset">${title} ${s}GB</a>`
+            newRow.appendChild(newLink)
+        }
+    }
+    linkDiv.appendChild(newRow)
+    
+}
+
+
+
+function render_comments(data) {
+    let commDiv = document.querySelector('#comments')
+    let keys = Object.keys(data)
+    var newH5 = document.createElement('h5')
+    newH5.textContent = "網友評價情緒："
+    commDiv.appendChild(newH5)
+    var newH6 = document.createElement('h6')
+    newH6.textContent = `平均情緒分數：${data[keys[0]]["score"]} (-1 ~ +1)`
+    commDiv.appendChild(newH6)
+
+    
+    for (var i = 1; i < 3; i += 1) {
+        var newUl = document.createElement('ul')
+        newUl.className = `${keys[i]}-comments`
+        if (keys[i] === "goods") {
+            newUl.innerHTML = "<h5>網評推薦：</h5>"
+        } else {
+            newUl.innerHTML = "<h5>網評不推：</h5>"
+        }
+        for (var j = 1; j < keys[i].length; j += 1) {
+            var newLi = document.createElement('li')
+            newLi.textContent = data[keys[i]][j]
+            newUl.appendChild(newLi)
+        }
+        commDiv.appendChild(newUl)
+    }
+}
+
 
 url_array = window.location.href.split("/")
 storage = url_array.pop()
@@ -155,5 +226,18 @@ fetch(`/api/v1/detail?title=${title}&storage=${storage}`,{
     draw_phone_graph(data)
     draw_storage_graph(data)
     render_products(data)
+    add_storage_link(data)
+    }
+)
+
+fetch(`/api/v1/comments?title=${title}`,{
+    method: 'GET',
+})
+.then(response => {
+    // console.log(response.json())
+    return response.json()
+})
+.then(data => {
+    render_comments(data)
     }
 )
