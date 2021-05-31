@@ -4,7 +4,7 @@
         <title>Smartphone-Smartprice</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
         <link href="/static/css/detail_page.css" rel="stylesheet">
-        <link rel="icon" type="image/png" href="/static/img/favicon.png" />
+        <link rel="icon" type="image/png" href="https://aws-bucket-addie.s3-ap-northeast-1.amazonaws.com/smartphone/favicon.png" />
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     </head>
     <nav class="navbar navbar-user">
@@ -22,7 +22,7 @@
             </div>
             <div>{{ user }}</div>
         {% else %}
-            <div><a class="text-center" href="{% url 'login' %}"><img src="/static/img/user.png" class="user-icon" id="logout-user"></a></div>
+            <div><a class="text-center" href="{% url 'login' %}"><img src="https://aws-bucket-addie.s3-ap-northeast-1.amazonaws.com/smartphone/user.png" class="user-icon" id="logout-user"></a></div>
         {% endif %}
     </nav>
     <nav class="navbar navbar-banner">
