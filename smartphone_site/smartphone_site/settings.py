@@ -15,11 +15,7 @@ from dotenv import load_dotenv
 
 import os
 
-load_dotenv()
-secret_key = os.getenv('SECRET_KEY')
-sql_host = os.getenv('SQL_HOST')
-sql_user = os.getenv('SQL_USER')
-sql_pwd = os.getenv('SQL_PWD')
+import env
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = secret_key
+SECRET_KEY = env.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -88,14 +84,23 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'smartphone',
-        'USER': sql_user,
-        'PASSWORD': sql_pwd,
-        'HOST': sql_host,
+        'USER': env.SQL_USER,
+        'PASSWORD': env.SQL_PWD,
+        'HOST': env.SQL_HOST,
         'PORT': '3306',
         'OPTIONS': {
             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
         }
     }
+#     ,
+#     'comments' : {
+#         'ENGINE' : 'django_mongodb_engine',
+#         'NAME' : 'my_database',
+#         'USER': mongo_user,
+#         'PASSWORD': mongo_pwd,
+#         'HOST': mongo_host,
+#         'PORT': '27017',
+#    }
 }
 
 
@@ -158,6 +163,9 @@ REST_FRAMEWORK = {
 
 LOGIN_REDIRECT_URL = 'smartphone-smartprice/home'
 
-AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY")
-AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_KEY")
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # media directory in the root directory
+MEDIA_URL = '/media/'
+
+# AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY")
+# AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_KEY")
 

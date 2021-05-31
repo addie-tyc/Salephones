@@ -6,7 +6,12 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
+from pymongo import MongoClient
+import env
 
+uri = "mongodb://{user}:{psw}@{host}:27017".format(user=env.MONGO_USER, psw=env.MONGO_PWD, host=env.MONGO_HOST)
+client = MongoClient(uri)
+db = client["mobileComm"]
 
 class AuthGroup(models.Model):
     name = models.CharField(unique=True, max_length=150)
