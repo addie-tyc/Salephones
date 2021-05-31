@@ -31,4 +31,5 @@ urlpatterns = [
     path('smartphone-smartprice/sale', views.SaleView.as_view(), name="sale"),
     path('api/v1/home', views.PttHomeView.as_view()),
     path('api/v1/detail', views.PttDetailView.as_view()),
+    path('api/v1/comments', views.CommentsView.as_view()),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

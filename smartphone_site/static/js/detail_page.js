@@ -1,4 +1,5 @@
 function render_products(data) {
+    
     let productsDiv = document.querySelector('tbody')
 
     let products = data.phone_table
@@ -176,6 +177,36 @@ function add_storage_link(data) {
 }
 
 
+
+function render_comments(data) {
+    let commDiv = document.querySelector('#comments')
+    let keys = Object.keys(data)
+    var newH5 = document.createElement('h5')
+    newH5.textContent = "網友評價情緒："
+    commDiv.appendChild(newH5)
+    var newH6 = document.createElement('h6')
+    newH6.textContent = `平均情緒分數：${data[keys[0]]["score"]} (-1 ~ +1)`
+    commDiv.appendChild(newH6)
+
+    
+    for (var i = 1; i < 3; i += 1) {
+        var newUl = document.createElement('ul')
+        newUl.className = `${keys[i]}-comments`
+        if (keys[i] === "goods") {
+            newUl.innerHTML = "<h5>網評推薦：</h5>"
+        } else {
+            newUl.innerHTML = "<h5>網評不推：</h5>"
+        }
+        for (var j = 1; j < keys[i].length; j += 1) {
+            var newLi = document.createElement('li')
+            newLi.textContent = data[keys[i]][j]
+            newUl.appendChild(newLi)
+        }
+        commDiv.appendChild(newUl)
+    }
+}
+
+
 url_array = window.location.href.split("/")
 storage = url_array.pop()
 title = url_array.pop().split("-").join("+")
@@ -196,5 +227,17 @@ fetch(`/api/v1/detail?title=${title}&storage=${storage}`,{
     draw_storage_graph(data)
     render_products(data)
     add_storage_link(data)
+    }
+)
+
+fetch(`/api/v1/comments?title=${title}`,{
+    method: 'GET',
+})
+.then(response => {
+    // console.log(response.json())
+    return response.json()
+})
+.then(data => {
+    render_comments(data)
     }
 )

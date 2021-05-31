@@ -10,16 +10,17 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib.auth.models import User
 import boto3
 
+
 from datetime import datetime, timedelta
 import requests
 from collections import defaultdict
 import time
 import os
 
-from .models import Ptt, Landtop
+from .models import Ptt, Landtop, db
 from .serializers import PttSerializer, LandtopSerializer, PttDetailSerializer, PttGraphSerializer
 from .forms import SignUpForm, LoginForm, SaleForm
-from django.conf import settings
+
 
 def home_page(request):
     return render(request, 'home_page.html')
@@ -374,6 +375,12 @@ class SaleView(GenericAPIView):
             # s3 = boto3.resource('s3', aws_access_key_id=settings.AWS_ACCESS_KEY, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
             # s3_bucket = s3.Bucket("aws-bucket-addie")
 
+            # create a new instance of FileSystemStorage
+            fs = FileSystemStorage()
+            file = fs.save(request_file.name, request_file)
+            # the fileurl variable now contains the url to the file. This can be used to serve the file when needed.
+            fileurl = fs.url(file)
+
             # # make main_image's path
             # root_path = os.path.dirname(os.path.abspath(__file__)) # get current path
             # upload_folder = os.path.join(root_path, "smartphone-uploads") # gen upload path
@@ -392,3 +399,38 @@ class SaleView(GenericAPIView):
         else:
             messages.error(request, 'Something went wrong. Please try again!')
         return redirect('/smartphone-smartprice/sale') 
+
+class CommentsView(GenericAPIView):
+    queryset = Ptt.objects.all()
+
+    def get(self, request, *args, **krgs):
+        title = request.GET.get('title')
+        db_coll = db["sentiment"]
+        fetch = [sample for sample in db_coll.find({ "title" : title })]
+        doc_score = [ d["doc"]["score"] for d in fetch ]
+        doc_mag = [ d["doc"]["magnitude"] for d in fetch ]
+        doc = {"score": round(sum(doc_score)/len(doc_score), 2), "magnitude": round(sum(doc_mag)/len(doc_mag), 2)}
+        sentences = []
+        for d in fetch:
+            sentences.extend(d["sentences"])
+
+        for d in sentences:
+            temp = []
+            if "<" in d["content"]:
+                lst = d["content"].split("<")
+                for i in lst:
+                    if ">" not in i:
+                        temp.append(i)
+                d["content"] = "，".join(temp)
+
+
+        sentences = sorted([ (d["content"], d["score"], d["magnitude"]) for d in sentences 
+                              if abs(d["score"]) >= 0.5 and abs(d["magnitude"]) >= 0.5 and len(d["content"]) > 5 ],
+                    key=lambda x: x[1], reverse=True)
+        goods = [i[0] for i in sentences if i[1] > 0]
+        bads = [i[0] for i in sentences if i[1] < 0]
+        arc_title = [ d["arc_title"] for d in fetch ]
+        link = [ "https://www.ptt.cc/"+d["link"] for d in fetch ]
+        data = {"doc":doc, "goods": goods, "bads": bads, "arc_title": arc_title, "link": link}
+        
+        return JsonResponse(data, json_dumps_params={'ensure_ascii':False})

@@ -27,7 +27,7 @@
     </nav>
     <nav class="navbar navbar-banner">
         <div class="container banner">
-            <a href="" class="link-reset">
+            <a href="/smartphone-smartprice/home" class="link-reset">
                 <img src="https://aws-bucket-addie.s3-ap-northeast-1.amazonaws.com/smartphone/banner.png" border="0" height=180px width=auto>
             </a>
         </div>
@@ -35,19 +35,23 @@
     <body>
         <div id=phone-title>
         </div>
-        <table id=phone-table class="float-start sortable products">
-            <tr class="row my-border-bottom">
-                <th class="col text-center">價格</th>
-                <th class="col-5 text-center">配件</th>
-                <th class="col text-center">來源</th>
-                <th class="col text-center">建立日期</th>
-            </tr>
-        </table>
+        <div id=phone-table-div class="float-start">
+            <table id=phone-table class="sortable products">
+                <tr class="row my-border-bottom">
+                    <th class="col text-center">價格</th>
+                    <th class="col-5 text-center">配件</th>
+                    <th class="col text-center">來源</th>
+                    <th class="col text-center">建立日期</th>
+                </tr>
+            </table>
+        </div>
         <div id=phone-graph class="float-end graph">
         </div>
         <div id=storage-graph class="float-end graph">
             <div id=storage-link class="links">
             </div>
+        </div>
+        <div id=comments class="float-end">
         </div>
     </body>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

@@ -90,16 +90,20 @@ h2 {
 
 /* table */
 
-#phone-table {
+#phone-table-div {
   width: 45%;
   margin-top: 26px;
   margin-right: 1%;
   margin-left: 4%;
-}
-
-/* tbody {
   height: 1400px;
   overflow: scroll;
+}
+
+/* #phone-table {
+  width: 45%;
+  margin-top: 26px;
+  margin-right: 1%;
+  margin-left: 4%;
 } */
 
 thead {
@@ -132,4 +136,22 @@ tbody tr:hover {
 
 .links a:hover {
   font-size: 20px;
+}
+
+/* comments */
+#comments {
+  margin-top: 20px;
+  margin-bottom: 26px;
+  margin-right: 4%;
+  margin-left: 1%;
+  width: 648px;
+}
+
+ul {
+  padding-left: 0;
+  margin-top: 20px;
+}
+
+ul li {
+  word-break: break-all;
 }
