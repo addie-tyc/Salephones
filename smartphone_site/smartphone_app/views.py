@@ -385,7 +385,7 @@ class SaleView(GenericAPIView):
         context = {
         'form': form
         }
-        return render(request, 'registration/sale.html', context)
+        return render(request, 'sale.html', context)
 
     def post(self, request):
         form = SaleForm(request.POST)
