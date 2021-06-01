@@ -1,0 +1,151 @@
+/* header */
+
+.navbar-user {
+  background-color: beige;
+  margin: 0;
+  margin-right: 5%;
+  padding: 0;
+  justify-content:flex-end;
+}
+
+.navbar-banner {
+  margin: 0;
+  padding: 0;
+}
+
+.navbar .banner {
+  background-color: #364F7D;
+  background-image: url('https://aws-bucket-addie.s3-ap-northeast-1.amazonaws.com/smartphone/smartphones.jpeg');
+  background-position: 473px;
+  background-repeat: no-repeat;
+  background-size: 80% auto;
+  height: 180px;
+  width: 100%;
+  max-width: 2000px;
+  margin: 0;
+  padding: 0;
+  justify-content:flex-start;
+}
+
+.navbar-nav li{
+  color: #fff;
+}
+
+.user-icon {
+  height: 36px;
+  border-radius: 50%;
+}
+
+#login-user {
+  background-color:#84A4DC;
+}
+
+#logout-user {
+  background-color:#888;
+}
+
+.dropdown-toggle::after {
+  display: none;
+}
+/* body */
+
+body {
+  background-color: beige;
+}
+
+h2 {
+  margin-top: 26px;
+  margin-bottom: 26px;
+  margin-left: 5%;
+}
+
+.buttons {
+  margin-top: 36px;
+}
+
+.products-by-brand {
+  margin-top: 6%; 
+  margin-bottom: 3%; 
+  }
+
+.border-pilled {
+  border: #2b506e 3px solid;
+  border-radius: 25px;
+  margin-right: 1px;
+}
+
+.my-border-bottom {
+  width: 100%;
+  margin-bottom: 26px;
+  border-bottom: #2b506e 1px solid;
+}
+
+.last-row {
+  padding-bottom: 26px;
+}
+
+.link-reset {
+  text-decoration: none;
+  color: #212529;
+}
+
+/* table */
+
+#phone-table-div {
+  width: 45%;
+  margin-top: 26px;
+  margin-right: 1%;
+  margin-left: 4%;
+  height: 1400px;
+  overflow: scroll;
+}
+
+thead {
+  font-size: 20px
+}
+
+thead tr th:hover {
+  cursor: pointer; 
+}
+
+tbody tr:hover { 
+  background: #84A4DC;
+  cursor: pointer; 
+}
+
+
+/* graph */
+
+.graph {
+  margin-top: 26px;
+  margin-bottom: 26px;
+  margin-right: 4%;
+  margin-left: 1%;
+}
+
+#storage-link {
+  margin-top: 26px;
+  margin-bottom: 26px;
+}
+
+.links a:hover {
+  font-size: 20px;
+}
+
+/* comments */
+#comments {
+  margin-top: 20px;
+  margin-bottom: 26px;
+  margin-right: 4%;
+  margin-left: 1%;
+  width: 648px;
+}
+
+ul {
+  padding-left: 0;
+  margin-top: 20px;
+}
+
+ul li {
+  word-break: break-all;
+}

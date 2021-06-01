@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="main-form">
+  <nav class="row">
+    <a href="/smartphone-smartprice/sale" class="current link-reset col text-center">手機上架</a>
+  </nav>
+  <form action="" method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form }}
+      <div class="btn-container">
+        <input class="btn border-pilled submit" type="submit" value="上架" />
+      </div>
+  </form>
+</div>
+<script src="/static/js/sale.js"></script>
+{% endblock  %}

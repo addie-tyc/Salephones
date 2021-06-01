@@ -6,7 +6,12 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
+from pymongo import MongoClient
+import env
 
+uri = "mongodb://{user}:{psw}@{host}:27017".format(user=env.MONGO_USER, psw=env.MONGO_PWD, host=env.MONGO_HOST)
+client = MongoClient(uri)
+db = client["mobileComm"]
 
 class AuthGroup(models.Model):
     name = models.CharField(unique=True, max_length=150)
@@ -137,15 +142,18 @@ class Ptt(models.Model):
     new = models.IntegerField(blank=True, null=True)
     sold = models.IntegerField(blank=True, null=True)
     account = models.CharField(max_length=255, blank=True, null=True)
+    email = models.CharField(max_length=255, blank=True, null=True)
     box = models.CharField(max_length=255, blank=True, null=True)
-    link = models.CharField(unique=True, max_length=255, blank=True, null=True)
+    link = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(blank=True, null=True)
     source = models.CharField(max_length=255, blank=True, null=True)
     page_number = models.IntegerField(blank=True, null=True)
+    images = models.TextField(blank=True, null=True)
+    status = models.TextField(blank=True, null=True)
     landtop = models.ManyToManyField(Landtop, through='PttLandtop', through_fields=('ptt', 'landtop'))
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'ptt'
 
 class PttLandtop(models.Model):

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<body>
+  <div class="main-form">
+    <nav class="row">
+      <a href="/smartphone-smartprice/login" class="link-reset col text-center">登入</a>
+      <a href="/smartphone-smartprice/signup" class="current link-reset col text-center">註冊</a>
+    </nav>
+    <form action="" method="POST">
+        {% csrf_token %}
+        {{ form }}
+
+        <br />
+        <div class="btn-container">
+          <input class="btn border-pilled submit" type="submit" value="註冊" />
+        </div>
+    </form>
+  </div>
+</body>
+
+{% endblock  %}
