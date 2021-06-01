@@ -57,7 +57,10 @@ class SignUpView(GenericAPIView):
             messages.success(request, 'Signed up successfully!')
             redirect('login')
         else:
-            messages.error(request, 'Something went wrong. Please try again!')
+            if form.errors:
+                messages.error(request, form.errors)
+            else:
+                messages.error(request, 'Something went wrong. Please try again!')
         return redirect('/smartphone-smartprice/signup') 
 
 
