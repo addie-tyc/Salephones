@@ -161,7 +161,7 @@ a.current {
 .success {
   list-style: none;
   text-align: center;
-  width: 50%;
+  width: 60%;
   margin: auto;
   margin-top: 26px;
   background-color: mediumaquamarine;
@@ -170,7 +170,7 @@ a.current {
 .error {
   list-style: none;
   text-align: center;
-  width: 50%;
+  width: 60%;
   margin: auto;
   margin-top: 26px;
   background-color: rgb(250, 100, 100);
