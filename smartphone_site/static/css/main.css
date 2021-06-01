@@ -152,7 +152,8 @@ a.current {
 
 /* error msg */
 .errorlist {
-  list-style: none;
+  text-align: center;
+  color: #f53d25;
 }
 
 /* success msg */
