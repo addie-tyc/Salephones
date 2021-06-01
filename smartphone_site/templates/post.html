@@ -19,7 +19,9 @@
         盒裝內容：{{ data.box }}
       </div>
       <div class="row m-left">
-        物品狀況：{{ data.status }}
+        物品狀況：<br>
+        <br>
+            {{ data.status }}
       </div>
       {% for img in data.images %}
         <div class="row text-center"><img src="{{ img }}"></div>

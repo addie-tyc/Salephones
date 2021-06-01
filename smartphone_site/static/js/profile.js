@@ -10,6 +10,17 @@ function render_user_info(user_info) {
 function render_post(data) {
     let postDiv = document.querySelector('#sale-post')
     let sale_post =  data.sale_post
+    var newDiv = document.createElement('div')
+    newDiv.className = "row text-center"
+    if (sale_post.length > 0) {
+        newDiv.innerHTML = `<div name="image" class="col-5 text-center"></div>
+        <div name="title" class="col text-center">商品名稱</div>
+        <div name="price" class="col text-center">價格</div>
+        <div name="created_at" class="col text-center">上架時間</div>`
+    } else {
+        newDiv.innerHTML = `<div class="col text-center">目前無資料</div>`
+    }
+    postDiv.appendChild(newDiv)
     for (var i = 0; i < sale_post.length; i += 1) {
         var newA = document.createElement('a')
         newA.className = "link-reset"
