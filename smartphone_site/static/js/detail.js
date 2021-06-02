@@ -174,7 +174,7 @@ function add_storage_link(data) {
 
 
 function render_comments(data) {
-    let commDiv = document.querySelector('#comments')
+    let commDiv = document.querySelector('#comments-div')
     let keys = Object.keys(data)
     if (data["doc"]["score"] >= 0) {
         var col = 'rgb(200,100,150)' 
@@ -199,26 +199,40 @@ function render_comments(data) {
         yaxis:{visible: false
         }
     }
-    Plotly.newPlot('comments', senti, layout);
+    Plotly.newPlot('comments-graph', senti, layout);
     // var newH6 = document.createElement('h6')
     // newH6.textContent = `平均情緒分數：${data[keys[0]]["score"]} (-1 ~ +1)`
     // commDiv.appendChild(newH6)
 
     
-    for (var i = 1; i < 3; i += 1) {
-        var newUl = document.createElement('ul')
-        newUl.className = `${keys[i]}-comments`
+    for (var i = 1; i < keys.length; i += 1) {
+ 
         if (keys[i] === "goods") {
-            newUl.innerHTML = "<h5>網評推薦：</h5>"
-        } else {
-            newUl.innerHTML = "<h5>網評不推：</h5>"
+            var newDiv = document.createElement('div')
+            newDiv.className = `comments`
+            newDiv.innerHTML = "<h5>網友正評</h5>"
+            var newUl = document.createElement('ul')
+            for (var j = 1; j < data[keys[i]].length; j += 1) {
+                var newLi = document.createElement('li')
+                newLi.textContent = data[keys[i]][j]
+                newUl.appendChild(newLi)
+            }
+            newDiv.appendChild(newUl)
+            commDiv.appendChild(newDiv)
+        } 
+        if (keys[i] === "bads") {
+            var newDiv = document.createElement('div')
+            newDiv.className = `comments`
+            newDiv.innerHTML = "<h5>網友負評</h5>"
+            var newUl = document.createElement('ul')
+            for (var j = 0; j < data[keys[i]].length; j += 1) {
+                var newLi = document.createElement('li')
+                newLi.textContent = data[keys[i]][j]
+                newUl.appendChild(newLi)
+            }
+            newDiv.appendChild(newUl)
+            commDiv.appendChild(newDiv)
         }
-        for (var j = 1; j < keys[i].length; j += 1) {
-            var newLi = document.createElement('li')
-            newLi.textContent = data[keys[i]][j]
-            newUl.appendChild(newLi)
-        }
-        commDiv.appendChild(newUl)
     }
 }
 

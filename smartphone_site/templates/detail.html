@@ -2,7 +2,7 @@
 <html>
     <head>
         <title>Smartphone-Smartprice</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+        <link href="/static/bootstrap-5.0.1-dist/css/bootstrap.min.css" rel="stylesheet">
         <link href="/static/css/detail.css" rel="stylesheet">
         <link rel="icon" type="image/png" href="https://aws-bucket-addie.s3-ap-northeast-1.amazonaws.com/smartphone/favicon.png" />
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
@@ -33,25 +33,36 @@
         </div>
     </nav>
     <body>
-        <div id=phone-title>
+        <div id=phone-title class="d-flex flex-column">
         </div>
         <div id=phone-table-div class="float-start">
-            <table id=phone-table class="sortable products">
-                <tr class="row my-border-bottom">
-                    <th class="col text-center">價格</th>
-                    <th class="col-5 text-center">配件</th>
-                    <th class="col text-center">來源</th>
-                    <th class="col text-center">建立日期</th>
-                </tr>
-            </table>
-        </div>
-        <div id=phone-graph class="float-end graph">
-        </div>
-        <div id=storage-graph class="float-end graph">
-            <div id=storage-link class="links">
+            <img src="/static/img/table.png" class="icon"><h4>手機情報</h4>
+            <div id=phone-table class="float-start">
+                <table id=phone-table class="sortable products">
+                    <tr class="row my-border-bottom">
+                        <th class="col text-center">價格</th>
+                        <th class="col-5 text-center">配件</th>
+                        <th class="col text-center">來源</th>
+                        <th class="col text-center">建立日期</th>
+                    </tr>
+                </table>
             </div>
         </div>
-        <div id=comments class="float-end">
+        <div class="graphs float-end">
+            <h4>價格圖表</h4>
+            <div id=phone-graph class="float-end graph">
+            </div>
+            <div id=storage-graph class="float-end graph">
+                <div id=storage-link class="links"></div>
+            </div>
+        </div>
+        <div class="word d-flex flex-column justify-content-center align-items-center clear-float">
+            <h3 class="">怕踩雷嗎？看用過的人怎麼說</h3>
+        </div>
+        <div id=comments-div class="clear-float">
+            <h4>用戶回饋</h4>
+            <div id=comments-graph class="clear-float text-center">
+            </div>
         </div>
     </body>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

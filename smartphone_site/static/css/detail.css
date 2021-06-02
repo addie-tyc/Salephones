@@ -54,8 +54,8 @@ body {
 }
 
 h2 {
-  margin-top: 26px;
-  margin-bottom: 26px;
+  margin-top: 3%;
+  margin-bottom: 3%;
   margin-left: 5%;
 }
 
@@ -89,14 +89,28 @@ h2 {
   color: #212529;
 }
 
+/* icon */
+
+.icon {
+  height: 1.5em;
+  display: inline-block;
+  /* background-color: #84A4DC; */
+}
+
+h4 {
+  display: inline-block;
+}
+
 /* table */
 
 #phone-table-div {
   width: 45%;
-  margin-top: 26px;
   margin-right: 1%;
   margin-left: 4%;
-  height: 1400px;
+}
+
+#phone-table {
+  height: 1000px;
   overflow: scroll;
 }
 
@@ -113,8 +127,16 @@ tbody tr:hover {
   cursor: pointer; 
 }
 
+tbody tr {
+  color: #333;
+}
+
 
 /* graph */
+
+.graphs {
+  width: 648px;
+}
 
 .graph {
   margin-top: 26px;
@@ -132,20 +154,46 @@ tbody tr:hover {
   font-size: 20px;
 }
 
+/* word */
+.word {
+  height: 200px;
+}
+
 /* comments */
-#comments {
-  margin-top: 20px;
+.clear-float {
+  clear:both;
+}
+
+#comments-div {
+  width: 60%;
+  margin: auto;
   margin-bottom: 26px;
-  margin-right: 4%;
-  margin-left: 1%;
-  width: 648px;
+  background-color: #fff;
+}
+
+#comments-div h4{
+  margin-left: 5%;
+  margin-top: 5%;
+}
+
+#comments-graph{
+  width:648px;
+  margin: auto;
+}
+
+.comments {
+  width: 90%;
+  margin: auto;
+  padding-bottom: 20px;
 }
 
 ul {
-  padding-left: 0;
-  margin-top: 20px;
+  height: 200px;
+  overflow: scroll;
 }
 
 ul li {
+  margin-left: 10px;
   word-break: break-all;
+  color: #777;
 }
