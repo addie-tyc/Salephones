@@ -52,6 +52,19 @@ class Ptt():
         db.close()
         return max_page
 
+    def insert_shopee(self, data):
+        db = self.db
+        cursor = db.cursor(pymysql.cursors.DictCursor)
+        cursor.executemany('''
+                          INSERT IGNORE INTO ptt
+                          (`title`, `storage`, `price`, `new`, `sold`, 
+                           `box`, `link`, `created_at`, `source`)
+                          VALUES (%s, %s, %s, %s, %s,
+                                  %s, %s, %s, %s) 
+                          ''', data)
+        db.commit()
+        db.close()
+
 class Landtop():
 
     def __init__(self):

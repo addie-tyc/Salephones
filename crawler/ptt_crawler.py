@@ -187,13 +187,13 @@ def crawl_mobilesales(links, page, sold, phone_dict, raw_data, data, error_links
                 except IndexError:
                     title = info[2]
 
-                if ("小米" in title.lower()) or ("redmi" in title.lower()) or ("poco" in title.lower()):
-                    title = "Xiaomi" + " " + title
-                if ("紅米" in title.lower()):
+                if ("紅米" in title.lower()) or ("redmi" in title.lower()):
                     title = "Redmi" + " " + title
-                if ("三星" in title.lower()) and ("samsung" in title.lower()):
+                elif ("小米" in title.lower()) or ("poco" in title.lower()):
+                    title = "Xiaomi" + " " + title
+                elif ("三星" in title.lower()) and ("samsung" in title.lower()):
                     title = "Samsung" + " " + title
-                if ("zenfone" in title.lower()) and ("asus" not in title.lower()):
+                elif ("zenfone" in title.lower()) and ("asus" not in title.lower()):
                     title = "Asus" + " " + title
 
                 title = " ".join(re.findall(r"[a-zA-Z0-9+]+", title))
