@@ -2,11 +2,15 @@
 
 .navbar-user {
   background-color: beige;
+  font-size: 20px;
   margin: 0;
   margin-right: 5%;
   padding: 0;
   justify-content:flex-end;
+  height: 36px;
+  z-index: 1;
 }
+
 
 .navbar-banner {
   margin: 0;
@@ -15,10 +19,10 @@
 
 .navbar .banner {
   background-color: #364F7D;
-  background-image: url('https://aws-bucket-addie.s3-ap-northeast-1.amazonaws.com/smartphone/smartphones.jpeg');
-  background-position: 473px;
+  /* background-image: url('https://aws-bucket-addie.s3-ap-northeast-1.amazonaws.com/smartphone/smartphones.jpeg');
+  background-position: 402px;
   background-repeat: no-repeat;
-  background-size: 80% auto;
+  background-size: 80% auto; */
   height: 180px;
   width: 100%;
   max-width: 2000px;
@@ -28,16 +32,16 @@
 }
 
 .navbar-nav li{
-  color: #fff;
+  color: #FFF;
 }
 
 .user-icon {
-  height: 36px;
+  height: 52px;
   border-radius: 50%;
 }
 
 #login-user {
-  background-color:#84A4DC;
+  background-color:#FECC33;
 }
 
 #logout-user {
@@ -101,6 +105,12 @@ h4 {
   display: inline-block;
 }
 
+/* board */
+.board {
+  background-color: #FFF;
+  border-radius: 15px; 
+}
+
 /* table */
 
 #phone-table-div {
@@ -123,7 +133,7 @@ thead tr th:hover {
 }
 
 tbody tr:hover { 
-  background: #84A4DC;
+  background: rgba(245,245,220,0.5);
   cursor: pointer; 
 }
 

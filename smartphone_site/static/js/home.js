@@ -63,15 +63,26 @@ function render_products(data) {
                 var link_title = d.title
             }
             newProduct.className = "link-reset"
-            newProduct.href = `/smartphone-smartprice/detail/${link_title.split(" ").join("-")}/${d.storage.replace("GB", "")}`
-            newProduct.innerHTML = `<div class="row my-border-bottom d-flex justify-content-center">
-                                        <div name="title" class="col-5 fs-4 text-center">${d.title}</div>
-                                        <div name="storage" class="col-3 fs-5 text-center">${d.storage}</div>
-                                        <div name=new-price class="col-3 fs-5 text-center">
-                                            <div class="row">新機均價： ${d.new_price}</div>
-                                            <div class="row last-row">二手均價： ${d.old_price}</div>
-                                        </div>
-                                    </div>`   
+            newProduct.href = `/detail/${link_title.split(" ").join("-")}/${d.storage.replace("GB", "")}`
+            if (d.title === lst[lst.length-1].title) {
+                newProduct.innerHTML = `<div class="row my-border-bottom d-flex last-row justify-content-center">
+                                            <div name="title" class="col-5 fs-4 text-center">${d.title}</div>
+                                            <div name="storage" class="col-3 fs-5 text-center">${d.storage}</div>
+                                            <div name=new-price class="col-3 fs-5 text-center">
+                                                <div class="row">新機均價： ${d.new_price}</div>
+                                                <div class="row last-column-bottom">二手均價： ${d.old_price}</div>
+                                            </div>
+                                        </div>`
+            } else {
+                newProduct.innerHTML = `<div class="row my-border-bottom d-flex justify-content-center">
+                                            <div name="title" class="col-5 fs-4 text-center">${d.title}</div>
+                                            <div name="storage" class="col-3 fs-5 text-center">${d.storage}</div>
+                                            <div name=new-price class="col-3 fs-5 text-center">
+                                                <div class="row">新機均價： ${d.new_price}</div>
+                                                <div class="row last-column-bottom">二手均價： ${d.old_price}</div>
+                                            </div>
+                                        </div>`
+            }   
             newBrand.appendChild(newProduct);
             }
         buttonsDiv.appendChild(newRow)

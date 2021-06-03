@@ -9,9 +9,9 @@ function render_products(data) {
         let d = products[i]
         newPost.className = "product row my-border-bottom justify-content-md-center"
         if (d.source === "native") {
-            d.link = `/smartphone-smartprice/post/${d.id}` 
+            d.link = `/post/${d.id}` 
         }
-        newPost.setAttribute('onclick', `document.location = '${d.link}';`);
+        newPost.setAttribute('onclick', `window.open('${d.link}')`);
         newPost.innerHTML = `
                                 <td name="price" class="col text-center">${d.price}</td>
                                 <td name="box" class="col-5">${d.box}</td>
@@ -163,7 +163,7 @@ function add_storage_link(data) {
             } else {
                 var link_title = title.replaceAll(" ", "-")
             }
-            newLink.innerHTML = `<a href="/smartphone-smartprice/detail/${link_title}/${s}" class="link-reset">${title} ${s}GB</a>`
+            newLink.innerHTML = `<a href="/detail/${link_title}/${s}" class="link-reset">${title} ${s}GB</a>`
             newRow.appendChild(newLink)
         }
     }
@@ -200,16 +200,13 @@ function render_comments(data) {
         }
     }
     Plotly.newPlot('comments-graph', senti, layout);
-    // var newH6 = document.createElement('h6')
-    // newH6.textContent = `平均情緒分數：${data[keys[0]]["score"]} (-1 ~ +1)`
-    // commDiv.appendChild(newH6)
 
     
     for (var i = 1; i < keys.length; i += 1) {
  
         if (keys[i] === "goods") {
             var newDiv = document.createElement('div')
-            newDiv.className = `comments`
+            newDiv.className = `comments board`
             newDiv.innerHTML = "<h5>網友正評</h5>"
             var newUl = document.createElement('ul')
             for (var j = 1; j < data[keys[i]].length; j += 1) {
@@ -222,7 +219,7 @@ function render_comments(data) {
         } 
         if (keys[i] === "bads") {
             var newDiv = document.createElement('div')
-            newDiv.className = `comments`
+            newDiv.className = `comments board`
             newDiv.innerHTML = "<h5>網友負評</h5>"
             var newUl = document.createElement('ul')
             for (var j = 0; j < data[keys[i]].length; j += 1) {

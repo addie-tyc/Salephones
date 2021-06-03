@@ -35,7 +35,7 @@ def detail_page(request, title, storage):
 
 def profile_page(request):
     if not request.user.is_authenticated:
-        return redirect('/smartphone-smartprice/login') 
+        return redirect('login') 
     return render(request, 'profile.html')
 
 class SignUpView(GenericAPIView):
@@ -43,7 +43,7 @@ class SignUpView(GenericAPIView):
 
     def get(self, request):
         if request.user.is_authenticated:
-            return redirect('/smartphone-smartprice/home') 
+            return redirect('home') 
         form = SignUpForm()
         context = {
         'form': form
@@ -61,7 +61,7 @@ class SignUpView(GenericAPIView):
                 messages.error(request, form.errors)
             else:
                 messages.error(request, 'Something went wrong. Please try again!')
-        return redirect('/smartphone-smartprice/signup') 
+        return redirect('signup') 
 
 
 class LoginView(GenericAPIView):
@@ -69,7 +69,7 @@ class LoginView(GenericAPIView):
 
     def get(self, request):
         if request.user.is_authenticated:
-            return redirect('/smartphone-smartprice/home') 
+            return redirect('home') 
         form = LoginForm()
         context = {
         'form': form
@@ -83,10 +83,10 @@ class LoginView(GenericAPIView):
         user = authenticate(username=username, password=password)
         if user:
             auth_login(request, user)
-            return redirect('/smartphone-smartprice/home')  #重新導向到首頁
+            return redirect('home')  #重新導向到首頁
         else:
             messages.error(request, 'Something went wrong. Please try again!')
-        return redirect('/smartphone-smartprice/login') 
+        return redirect('login') 
 
 class LogoutView(GenericAPIView):
     queryset = User.objects.all()
@@ -94,7 +94,7 @@ class LogoutView(GenericAPIView):
     def get(self, request):
         if request.user.is_authenticated:
             auth_logout(request)
-        return redirect('/smartphone-smartprice/login')
+        return redirect('login')
 
 def get_phones():
     url = "https://en.wikipedia.org/wiki/List_of_Android_smartphones"
@@ -383,7 +383,7 @@ class SaleView(GenericAPIView):
 
     def get(self, request):
         if not request.user.is_authenticated:
-            return redirect('/smartphone-smartprice/home') 
+            return redirect('home') 
         form = SaleForm()
         context = {
         'form': form
@@ -425,7 +425,7 @@ class SaleView(GenericAPIView):
             messages.success(request, 'Add Product successfully!')
         else:
             messages.error(request, 'Something went wrong. Please try again!')
-        return redirect('/smartphone-smartprice/sale') 
+        return redirect('sale') 
 
 
 class CommentsView(GenericAPIView):
@@ -471,7 +471,7 @@ class ProfileView(GenericAPIView):
 
     def get(self, request):
         if not request.user.is_authenticated:
-            return redirect('/smartphone-smartprice/login')
+            return redirect('login')
         current_user = request.user
         fetch = self.queryset.all().filter(account=current_user.username, source="native")
         serializer = self.serializer_class(fetch, many=True)
@@ -489,7 +489,7 @@ class PostView(GenericAPIView):
 
     def get(self, request, id):
         if not request.user.is_authenticated:
-            return redirect('/smartphone-smartprice/login')
+            return redirect('login')
         id = request.path.split('/')[-1]
         print(id)
         fetch = get_object_or_404(Ptt, pk=id)
