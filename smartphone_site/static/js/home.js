@@ -49,7 +49,7 @@ function render_products(data) {
         newBrand.id = `${brand}`
         newBrand.className = "products-by-brand"
         newBrand.innerHTML = `<div class="row">
-                                <h2 class="col-3">${brand}</h2>
+                                <div class="col-3"><img class="brand-logo" src="https://aws-bucket-addie.s3-ap-northeast-1.amazonaws.com/smartphone/brand_logos/logo_${brand.toLowerCase()}.svg"</div>
                                 <div class="col-3"></div>
                                 <div class="col-3"></div>
                              </div>`

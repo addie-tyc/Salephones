@@ -5,6 +5,8 @@
         <link href="/static/bootstrap-5.0.1-dist/css/bootstrap.min.css" rel="stylesheet">
         <link href="/static/css/detail.css" rel="stylesheet">
         <link rel="icon" type="image/png" href="https://aws-bucket-addie.s3-ap-northeast-1.amazonaws.com/smartphone/favicon.png" />
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600&display=swap" rel="stylesheet">
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     </head>
     <nav class="navbar navbar-user">
@@ -28,7 +30,7 @@
     <nav class="navbar navbar-banner">
         <div class="container banner">
             <a href="/home" class="link-reset">
-                <img src="https://aws-bucket-addie.s3-ap-northeast-1.amazonaws.com/smartphone/banner.png" border="0" height=180px width=auto>
+                <img src="https://aws-bucket-addie.s3-ap-northeast-1.amazonaws.com/smartphone/banner.png" border="0" height=150px width=auto>
             </a>
         </div>
     </nav>
@@ -36,9 +38,12 @@
         <div id=phone-title class="d-flex flex-column">
         </div>
         <div id=phone-table-div class="float-start board">
-            <img src="/static/img/table.png" class="icon"><h4>手機情報</h4>
+            <div class="word-div">
+                <h4>手機情報</h4>
+            </div>
+            <hr>
             <div id=phone-table class="float-start">
-                <table id=phone-table class="sortable products">
+                <table class="sortable products">
                     <tr class="row my-border-bottom">
                         <th class="col text-center">價格</th>
                         <th class="col-5 text-center">配件</th>
@@ -49,12 +54,25 @@
             </div>
         </div>
         <div class="graphs float-end">
-            <h4>價格圖表</h4>
-            <div id=phone-graph class="float-end graph board">
+
+            <div class="board graph">
+                <div class="word-div">
+                    <h4>歷史價格圖表</h4>
+                </div>
+                <hr>
+                <div id=phone-graph class=""></div>
             </div>
-            <div id=storage-graph class="float-end graph board">
-                <div id=storage-link class="links"></div>
+
+            <div class="board graph">
+                <div class="word-div">
+                    <h4>不同容量歷史價格圖表</h4>
+                </div>
+                <hr>
+                <div id=storage-graph class="">
+                    <div id=storage-link class="links"></div>
+                </div>
             </div>
+
         </div>
         <div class="word d-flex flex-column justify-content-center align-items-center clear-float">
             <h3 class="">怕踩雷嗎？看用過的人怎麼說</h3>

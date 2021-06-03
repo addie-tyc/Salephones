@@ -9,8 +9,13 @@
   justify-content:flex-end;
   height: 36px;
   z-index: 1;
+  font-family: 'Nunito', sans-serif;
 }
 
+/* #username {
+  display: table;
+  vertical-align: top;
+} */
 
 .navbar-banner {
   margin: 0;
@@ -23,7 +28,7 @@
   background-position: 402px;
   background-repeat: no-repeat;
   background-size: 80% auto; */
-  height: 180px;
+  height: 150px;
   width: 100%;
   max-width: 2000px;
   margin: 0;
@@ -55,6 +60,7 @@
 
 body {
   background-color: beige;
+  font-family: 'Nunito', sans-serif;
 }
 
 h2 {
@@ -78,12 +84,6 @@ h2 {
   margin-right: 1px;
 }
 
-.my-border-bottom {
-  width: 100%;
-  margin-bottom: 26px;
-  border-bottom: #2b506e 1px solid;
-}
-
 .last-row {
   padding-bottom: 26px;
 }
@@ -101,9 +101,6 @@ h2 {
   /* background-color: #84A4DC; */
 }
 
-h4 {
-  display: inline-block;
-}
 
 /* board */
 .board {
@@ -111,12 +108,26 @@ h4 {
   border-radius: 15px; 
 }
 
+hr {
+  margin: 0;
+}
+
+.word-div {
+  margin-left: 1%;
+}
+
+h4 {
+  height: 1.5em;
+  vertical-align: middle;
+  display: table-cell;
+}
+
 /* table */
 
 #phone-table-div {
   width: 45%;
-  margin-right: 1%;
-  margin-left: 4%;
+  margin-left: 2.5%;
+  margin-right: 2.5%;
 }
 
 #phone-table {
@@ -141,27 +152,40 @@ tbody tr {
   color: #333;
 }
 
+.my-border-bottom {
+  width: 90%;
+  margin: auto;
+  margin-bottom: 26px;
+  border-bottom: #2b506e 1px solid;
+}
+
 
 /* graph */
 
 .graphs {
-  width: 648px;
+  width: 45%;
+  margin-left: 2.5%;
+  margin-right: 2.5%;
 }
 
 .graph {
-  margin-top: 26px;
+  width: 648px;
+  margin: auto;
   margin-bottom: 26px;
-  margin-right: 4%;
-  margin-left: 1%;
 }
 
+/* #storage-graph {
+  position: absolute;
+  bottom: 0; 
+} */
+
+
 #storage-link {
-  margin-top: 26px;
-  margin-bottom: 26px;
+  padding-bottom: 26px;
 }
 
 .links a:hover {
-  font-size: 20px;
+  background: rgba(245,245,220,0.5);
 }
 
 /* word */
@@ -178,7 +202,6 @@ tbody tr {
   width: 60%;
   margin: auto;
   margin-bottom: 26px;
-  background-color: #fff;
 }
 
 #comments-div h4{

@@ -112,22 +112,6 @@ function draw_storage_graph (data) {
 
     }
 
-    var new_price = {
-        x: graph.date, 
-        y: graph.new_price, 
-        line: {color: 'rgb(200,100,150)'}, 
-        name: "Buy a New One Today", 
-        type: "scatter"
-      };
-
-    var avg_price_30 = {
-        x: graph.date, 
-        y: graph.avg_price_30, 
-        line: {color: 'rgb(100,200,150)'}, 
-        name: "Second-hand Avg Price <br> within 30 Days", 
-        type: "scatter"
-    };
-
     var layout = {
         title: {
             text:`${phone} Price History of different storage`,
@@ -145,9 +129,10 @@ function add_storage_link(data) {
     let storage = data.storage
     let storages = Object.keys(graph)
     if (storages.length > 1) {
-        let newP = document.createElement('p')
-        newP.textContent = "參考更多："
-        linkDiv.appendChild(newP)
+        let newDiv = document.createElement('div')
+        newDiv.className = "word-div"
+        newDiv.textContent = "參考更多："
+        linkDiv.appendChild(newDiv)
     }
     let newRow = document.createElement('div')
     newRow.className = "row"
