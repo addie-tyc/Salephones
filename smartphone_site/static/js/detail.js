@@ -20,6 +20,8 @@ function render_products(data) {
                              `
         productsDiv.appendChild(newPost)
         }
+    let phone_table = document.querySelector('#phone-table')
+    sorttable.makeSortable(phone_table);
 }
 
 function draw_phone_graph (data) {
@@ -217,7 +219,6 @@ function render_comments(data) {
         }
     }
 }
-
 
 url_array = window.location.href.split("/")
 storage = url_array.pop()
