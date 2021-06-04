@@ -131,8 +131,10 @@ h4 {
 }
 
 #phone-table {
-  height: 1000px;
+  width: 100%;
   overflow: scroll;
+  /* aspect-ratio: 9 / 8; */
+  height: calc(45vw * 1.185);
 }
 
 thead {
@@ -164,24 +166,30 @@ tbody tr {
 
 .graphs {
   width: 45%;
+  aspect-ratio: 9 / 16;
   margin-left: 2.5%;
   margin-right: 2.5%;
 }
 
 .graph {
-  width: 648px;
+  width: 100%;
   margin: auto;
-  margin-bottom: 26px;
+  margin-bottom: calc(45vw*0.03);
 }
 
-/* #storage-graph {
-  position: absolute;
-  bottom: 0; 
-} */
+#phone-graph-div {
+  display: inline-block;
+  vertical-align: top;
+} 
+
+#storage-graph-div {
+  display: inline-block;
+  vertical-align: bottom;
+} 
 
 
 #storage-link {
-  padding-bottom: 26px;
+  padding-bottom: calc(45vw*0.03);
 }
 
 .links a:hover {

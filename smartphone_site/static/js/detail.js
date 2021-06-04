@@ -77,8 +77,8 @@ function draw_phone_graph (data) {
         title: {
             text:`${phone} Price History`,
         },
-        width: 648,
-        height: 400
+        width: screen.width*0.44,
+        height: screen.width*0.44*0.5625
     }
     var data = [avg, avg_low, avg_high, new_price, avg_price_30]
     Plotly.newPlot('phone-graph', data, layout);
@@ -116,8 +116,8 @@ function draw_storage_graph (data) {
         title: {
             text:`${phone} Price History of different storage`,
         },
-        width: 648,
-        height: 400
+        width: screen.width*0.44,
+        height: screen.width*0.44*0.5625
     }
     Plotly.newPlot('storage-graph', data, layout);
 }
