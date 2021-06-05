@@ -502,3 +502,8 @@ class PostView(GenericAPIView):
         }
         return render(request, 'post.html', context)
         # return JsonResponse(data, json_dumps_params={'ensure_ascii':False}, safe=False)
+
+ssl_file = env.SSL_FILE
+def get_ssl_file(request):
+    file = open(ssl_file).read()
+    return HttpResponse(file)

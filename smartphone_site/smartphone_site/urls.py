@@ -20,6 +20,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from smartphone_app import views
+import env
+
+ssl_path = env.SSL_PATH
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -37,4 +40,5 @@ urlpatterns = [
     path('api/v1/storage-graph', views.PttStorageGraphView.as_view()),
     path('api/v1/comments', views.CommentsView.as_view()),
     path('api/v1/profile', views.ProfileView.as_view()),
+    path(ssl_path, views.get_ssl_file),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
