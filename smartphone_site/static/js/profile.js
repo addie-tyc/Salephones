@@ -24,7 +24,7 @@ function render_post(data) {
     for (var i = 0; i < sale_post.length; i += 1) {
         var newA = document.createElement('a')
         newA.className = "link-reset"
-        newA.href = `/smartphone-smartprice/post/${sale_post[i].id}`
+        newA.href = `/post/${sale_post[i].id}`
         var img = sale_post[i]["images"].split(',')[0]
         newA.innerHTML = `<div class="row post v-center">
                                 <div name="image" class="col-5 text-center"><img src=${img}></div>
