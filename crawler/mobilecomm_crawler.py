@@ -176,18 +176,19 @@ def crawl_comm(links):
         if "200" in str(resp):
             soup = BeautifulSoup(resp.text, "html.parser")
             main = soup.find("div", id="main-content")
+            info = [ i.text.strip() for i in soup.findAll("span", class_="article-meta-value")]
             if "※ 引述" in str(main):   
                 body = str(main).split('※ 引述')[0].split('</span></div>')[-1].replace(" ","").replace("\n", "。")
             else:
                 body = str(main).split('--')[0].split('</span></div>')[-1].replace(" ","").replace("\n", "。")
         doc, sentences = sample_analyze_sentiment(body)
-        d = {"title": link[0], "arc_title": link[1], "link": link[2], "page": link[3], "doc": doc, "sentences": sentences}
+        d = {"title": link[0], "arc_title": link[1], "link": link[2], "page": link[3], "doc": doc, "sentences": sentences, "body": body}
         data.append(d)
     return data
 
 def crawl_comm_pages():
     
-    for page in range(20, 100):
+    for page in range(1, 100):
 
         ua = UserAgent()
         fakeua = ua.random
@@ -201,7 +202,7 @@ def crawl_comm_pages():
         phone_list = get_phones()
         resp = requests.get(url, headers=headers)
         index_soup = BeautifulSoup(resp.text, "html.parser")
-        keywords = ["換", "vs", "v.s", "vs.", "v.s."]
+        keywords = ["換", "vs", "v.s", "vs.", "v.s.", "跳"]
         title = index_soup.findAll("div", class_="title")
         extend = ["Note 20 Ultra", "S20 Ultra", "S21 Ultra", "S20+", "S21+", "S20", "S21"]
         links = []
