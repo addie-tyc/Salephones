@@ -130,11 +130,15 @@ h4 {
   margin-right: 2.5%;
 }
 
-#phone-table {
+tbody {
   width: 100%;
   overflow: scroll;
-  /* aspect-ratio: 9 / 8; */
-  height: calc(45vw * 1.185);
+  height: calc(45vw * 1.21);
+  display: block;
+}
+
+tr {
+display: table;
 }
 
 thead {
@@ -166,7 +170,6 @@ tbody tr {
 
 .graphs {
   width: 45%;
-  aspect-ratio: 9 / 16;
   margin-left: 2.5%;
   margin-right: 2.5%;
 }

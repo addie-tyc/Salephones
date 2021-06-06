@@ -162,60 +162,65 @@ function add_storage_link(data) {
 
 function render_comments(data) {
     let commDiv = document.querySelector('#comments-div')
+    let commWord = document.querySelector('#comments-word')
     let keys = Object.keys(data)
-    if (data["doc"]["score"] >= 0) {
-        var col = 'rgb(200,100,150)' 
-    } else {
-        var col = 'rgb(0,100,150)' 
-    }
-    var senti = [{
-        type: 'bar',
-        x: [data["doc"]["score"]],
-        y: ["score"],
-        line: {color: col}, 
-        width: [1],
-        orientation: 'h'
-      }];
-    var layout = {
-        title: "網友評價情緒",
-        width: 648,
-        height: 200,
-        xaxis: {
-            range: [-0.05, 0.05],
-            },
-        yaxis:{visible: false
+    if (keys.length > 0) {
+        commWord.innerHTML = `<h3 class="">怕踩雷嗎？看用過的人怎麼說</h3>`
+        commDiv.innerHTML = `<h4>用戶回饋</h4>`
+        if (data["doc"]["score"] >= 0) {
+            var col = 'rgb(200,100,150)' 
+        } else {
+            var col = 'rgb(0,100,150)' 
         }
-    }
-    Plotly.newPlot('comments-graph', senti, layout);
+        var senti = [{
+            type: 'bar',
+            x: [data["doc"]["score"]],
+            y: ["score"],
+            line: {color: col}, 
+            width: [1],
+            orientation: 'h'
+        }];
+        var layout = {
+            title: "網友評價情緒",
+            width: 648,
+            height: 200,
+            xaxis: {
+                range: [-0.05, 0.05],
+                },
+            yaxis:{visible: false
+            }
+        }
+        Plotly.newPlot('comments-graph', senti, layout);
 
+        
+        for (var i = 1; i < keys.length; i += 1) {
     
-    for (var i = 1; i < keys.length; i += 1) {
- 
-        if (keys[i] === "goods") {
-            var newDiv = document.createElement('div')
-            newDiv.className = `comments board`
-            newDiv.innerHTML = "<h5>網友正評</h5>"
-            var newUl = document.createElement('ul')
-            for (var j = 1; j < data[keys[i]].length; j += 1) {
-                var newLi = document.createElement('li')
-                newLi.textContent = data[keys[i]][j]
-                newUl.appendChild(newLi)
+            if (keys[i] === "goods") {
+                var newDiv = document.createElement('div')
+                newDiv.className = `comments board`
+                newDiv.innerHTML = "<h5>網友正評</h5>"
+                var newUl = document.createElement('ul')
+                for (var j = 1; j < data[keys[i]].length; j += 1) {
+                    var newLi = document.createElement('li')
+                    newLi.textContent = data[keys[i]][j]
+                    newUl.appendChild(newLi)
+                }
+                newDiv.appendChild(newUl)
+                commDiv.appendChild(newDiv)
+            } 
+            if (keys[i] === "bads") {
+                var newDiv = document.createElement('div')
+                newDiv.className = `comments board`
+                newDiv.innerHTML = "<h5>網友負評</h5>"
+                var newUl = document.createElement('ul')
+                for (var j = 0; j < data[keys[i]].length; j += 1) {
+                    var newLi = document.createElement('li')
+                    newLi.textContent = data[keys[i]][j]
+                    newUl.appendChild(newLi)
+                }
+                newDiv.appendChild(newUl)
+                commDiv.appendChild(newDiv)
             }
-            newDiv.appendChild(newUl)
-            commDiv.appendChild(newDiv)
-        } 
-        if (keys[i] === "bads") {
-            var newDiv = document.createElement('div')
-            newDiv.className = `comments board`
-            newDiv.innerHTML = "<h5>網友負評</h5>"
-            var newUl = document.createElement('ul')
-            for (var j = 0; j < data[keys[i]].length; j += 1) {
-                var newLi = document.createElement('li')
-                newLi.textContent = data[keys[i]][j]
-                newUl.appendChild(newLi)
-            }
-            newDiv.appendChild(newUl)
-            commDiv.appendChild(newDiv)
         }
     }
 }
