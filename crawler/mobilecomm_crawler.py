@@ -181,14 +181,22 @@ def crawl_comm(links):
                 body = str(main).split('※ 引述')[0].split('</span></div>')[-1].replace(" ","").replace("\n", "。")
             else:
                 body = str(main).split('--')[0].split('</span></div>')[-1].replace(" ","").replace("\n", "。")
+            try:
+                created_at = datetime.strptime(info[3][3:].strip(), '%b %d %H:%M:%S %Y')
+            except IndexError:
+                try:
+                    created_at = " ".join(re.findall(r'時間.+\n', str(soup.find("div", id="main-content")))[0].split(" ")[2:]).strip()
+                    created_at = datetime.strptime(created_at, '%b %d %H:%M:%S %Y')
+                except:
+                    craeted_at = None
         doc, sentences = sample_analyze_sentiment(body)
-        d = {"title": link[0], "arc_title": link[1], "link": link[2], "page": link[3], "doc": doc, "sentences": sentences, "body": body}
+        d = {"title": link[0], "arc_title": link[1], "link": link[2], "page": link[3], "doc": doc, "sentences": sentences, "body": body, "created_at": created_at}
         data.append(d)
     return data
 
 def crawl_comm_pages():
     
-    for page in range(1, 100):
+    for page in range(77, 100):
 
         ua = UserAgent()
         fakeua = ua.random
