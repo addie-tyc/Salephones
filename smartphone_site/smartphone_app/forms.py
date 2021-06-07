@@ -17,7 +17,7 @@ class SignUpForm(UserCreationForm):
         widget=forms.EmailInput(attrs={'class': 'form-control'})
     )
     password1 = forms.CharField(
-        label="密碼",
+        label="密碼(至少 8 位、英數混合，勿使用 帳號 或 email 相似字)",
         widget=forms.PasswordInput(attrs={'class': 'form-control'})
     )
     password2 = forms.CharField(
