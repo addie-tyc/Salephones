@@ -210,14 +210,14 @@ tbody tr {
 }
 
 #comments-div {
-  width: 60%;
+  width: 100%;
   margin: auto;
   margin-bottom: 26px;
 }
 
-#comments-div h4{
-  margin-left: 5%;
-  margin-top: 5%;
+#comments-div h5{
+  margin-left: 2%;
+  margin-top: 2%;
 }
 
 #comments-graph{
@@ -226,8 +226,11 @@ tbody tr {
 }
 
 .comments {
-  width: 90%;
-  margin: auto;
+  width: 45%;
+  margin-left: 2.5%;
+  margin-right: 2.5%;
+  margin-top: 2%;
+  margin-bottom: 2%;
   padding-bottom: 20px;
 }
 

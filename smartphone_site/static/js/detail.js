@@ -166,7 +166,10 @@ function render_comments(data) {
     let keys = Object.keys(data)
     if (keys.length > 0) {
         commWord.innerHTML = `<h3 class="">怕踩雷嗎？看用過的人怎麼說</h3>`
-        commDiv.innerHTML = `<h4>用戶回饋</h4>`
+        // <h4>用戶回饋</h4>
+        commDiv.innerHTML = `
+                             <div id=comments-graph class="clear-float text-center board">
+                             </div>`
         if (data["doc"]["score"] >= 0) {
             var col = 'rgb(200,100,150)' 
         } else {
@@ -197,7 +200,7 @@ function render_comments(data) {
     
             if (keys[i] === "goods") {
                 var newDiv = document.createElement('div')
-                newDiv.className = `comments board`
+                newDiv.className = `comments board float-start`
                 newDiv.innerHTML = "<h5>網友正評</h5>"
                 var newUl = document.createElement('ul')
                 for (var j = 1; j < data[keys[i]].length; j += 1) {
@@ -210,7 +213,7 @@ function render_comments(data) {
             } 
             if (keys[i] === "bads") {
                 var newDiv = document.createElement('div')
-                newDiv.className = `comments board`
+                newDiv.className = `comments board float-end`
                 newDiv.innerHTML = "<h5>網友負評</h5>"
                 var newUl = document.createElement('ul')
                 for (var j = 0; j < data[keys[i]].length; j += 1) {
