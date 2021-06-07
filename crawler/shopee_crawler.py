@@ -20,7 +20,7 @@ def gen_header_search(keyword):
     }
     return headers
 
-def gen_header(keyword, referer):
+def gen_header(referer):
     ua = UserAgent()
     fakeua = ua.random
     headers = {
@@ -246,7 +246,7 @@ def crawl_shopee(proxy_lst=proxy_lst, end=5000, step=50):
                     if int(d["price"]/100000) > 2000:
                         start = time.time()
                         rf = f'https://shopee.tw/product/{d["shopid"]}/{d["itemid"]}'
-                        headers = gen_header(keyword, rf)
+                        headers = gen_header(rf)
                         url = f'https://shopee.tw/api/v2/item/get?itemid={d["itemid"]}&shopid={d["shopid"]}'
                         r = requests.get(url, headers=headers)
                         item = r.json()["item"]
