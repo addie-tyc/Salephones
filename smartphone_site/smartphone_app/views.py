@@ -274,7 +274,9 @@ class PttTableView(GenericAPIView):
 
         # phone_table
         fetch = (self.get_queryset()
-        .filter(title=title, storage=storage, sold=0, price__gt=1000)
+        .filter(title=title, storage=storage, sold=0, price__gt=1000, price__lt=99999)
+        .exclude(storage__isnull=True)
+        .exclude(price__isnull=True)
         .order_by('-created_at'))
 
         serializer = self.serializer_class(fetch, many=True)
@@ -303,7 +305,7 @@ class PttPriceGraphView(GenericAPIView):
                   min_price=Min('price'), 
                   max_price=Max('price'),
                   id=Max('id', output_field=IntegerField()))
-        .filter(title=title, storage=storage, price__gt=1000)
+        .filter(title=title, storage=storage, price__gt=1000, price__lt=99999)
         .exclude(storage__isnull=True)
         .exclude(price__isnull=True)
         .order_by('date'))
@@ -314,7 +316,7 @@ class PttPriceGraphView(GenericAPIView):
         fetch = (self.get_queryset()
         .annotate(date=Cast('created_at', output_field=DateField()), 
                   avg_price_30=Round(Avg('price', output_field=FloatField()), 0))
-        .filter(title=title, storage=storage, price__gt=1000, date__gt=datetime.now().date()-timedelta(days=30))
+        .filter(title=title, storage=storage, price__gt=1000, date__gt=datetime.now().date()-timedelta(days=30), price__lt=99999)
         .exclude(storage__isnull=True)
         .exclude(price__isnull=True))
 
@@ -357,7 +359,7 @@ class PttStorageGraphView(GenericAPIView):
                   min_price=Min('price'), 
                   max_price=Max('price'),
                   id=Max('id', output_field=IntegerField()))
-        .filter(title=title, price__gt=1000)
+        .filter(title=title, price__gt=1000, price__lt=99999)
         .exclude(storage__isnull=True)
         .exclude(price__isnull=True)
         .order_by('storage', 'date'))
@@ -435,32 +437,35 @@ class CommentsView(GenericAPIView):
         title = request.GET.get('title')
         db_coll = db["sentiment"]
         fetch = [sample for sample in db_coll.find({ "title" : title })]
-        doc_score = [ d["doc"]["score"] for d in fetch ]
-        doc_mag = [ d["doc"]["magnitude"] for d in fetch ]
-        doc = {"score": round(sum(doc_score)/len(doc_score), 2), "magnitude": round(sum(doc_mag)/len(doc_mag), 2)}
-        sentences = []
-        for d in fetch:
-            sentences.extend(d["sentences"])
+        if len(fetch) > 0:
+            doc_score = [ d["doc"]["score"] for d in fetch ]
+            doc_mag = [ d["doc"]["magnitude"] for d in fetch ]
+            doc = {"score": round(sum(doc_score)/len(doc_score), 2), "magnitude": round(sum(doc_mag)/len(doc_mag), 2)}
+            sentences = []
+            for d in fetch:
+                sentences.extend(d["sentences"])
 
-        for d in sentences:
-            temp = []
-            if "<" in d["content"]:
-                lst = d["content"].split("<")
-                for i in lst:
-                    if ">" not in i:
-                        temp.append(i)
-                d["content"] = "，".join(temp)
+            for d in sentences:
+                temp = []
+                if "<" in d["content"]:
+                    lst = d["content"].split("<")
+                    for i in lst:
+                        if ">" not in i:
+                            temp.append(i)
+                    d["content"] = "，".join(temp)
 
 
-        sentences = sorted([ (d["content"], d["score"], d["magnitude"]) for d in sentences 
-                              if abs(d["score"]) >= 0.5 and abs(d["magnitude"]) >= 0.5 and len(d["content"]) > 5 ],
-                    key=lambda x: x[1], reverse=True)
-        goods = [i[0] for i in sentences if i[1] > 0]
-        bads = [i[0] for i in sentences if i[1] < 0]
-        arc_title = [ d["arc_title"] for d in fetch ]
-        link = [ "https://www.ptt.cc/"+d["link"] for d in fetch ]
-        data = {"doc":doc, "goods": goods, "bads": bads, "arc_title": arc_title, "link": link}
-        
+            sentences = sorted([ (d["content"], d["score"], d["magnitude"]) for d in sentences 
+                                if abs(d["score"]) >= 0.5 and abs(d["magnitude"]) >= 0.5 and len(d["content"]) > 5 ],
+                        key=lambda x: x[1], reverse=True)
+            goods = [i[0] for i in sentences if i[1] > 0]
+            bads = [i[0] for i in sentences if i[1] < 0]
+            arc_title = [ d["arc_title"] for d in fetch ]
+            link = [ "https://www.ptt.cc/"+d["link"] for d in fetch ]
+            data = {"doc":doc, "goods": goods, "bads": bads, "arc_title": arc_title, "link": link}
+        else:
+            data = {}
+            
         return JsonResponse(data, json_dumps_params={'ensure_ascii':False})
 
 
