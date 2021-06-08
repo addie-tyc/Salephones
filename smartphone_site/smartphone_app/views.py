@@ -35,7 +35,7 @@ def detail_page(request, title, storage):
 
 def profile_page(request):
     if not request.user.is_authenticated:
-        return redirect('/smartphone-smartprice/login') 
+        return redirect('login') 
     return render(request, 'profile.html')
 
 class SignUpView(GenericAPIView):
@@ -43,7 +43,7 @@ class SignUpView(GenericAPIView):
 
     def get(self, request):
         if request.user.is_authenticated:
-            return redirect('/smartphone-smartprice/home') 
+            return redirect('home') 
         form = SignUpForm()
         context = {
         'form': form
@@ -61,7 +61,7 @@ class SignUpView(GenericAPIView):
                 messages.error(request, form.errors)
             else:
                 messages.error(request, 'Something went wrong. Please try again!')
-        return redirect('/smartphone-smartprice/signup') 
+        return redirect('signup') 
 
 
 class LoginView(GenericAPIView):
@@ -69,7 +69,7 @@ class LoginView(GenericAPIView):
 
     def get(self, request):
         if request.user.is_authenticated:
-            return redirect('/smartphone-smartprice/home') 
+            return redirect('home') 
         form = LoginForm()
         context = {
         'form': form
@@ -83,10 +83,10 @@ class LoginView(GenericAPIView):
         user = authenticate(username=username, password=password)
         if user:
             auth_login(request, user)
-            return redirect('/smartphone-smartprice/home')  #重新導向到首頁
+            return redirect('home')  #重新導向到首頁
         else:
             messages.error(request, 'Something went wrong. Please try again!')
-        return redirect('/smartphone-smartprice/login') 
+        return redirect('login') 
 
 class LogoutView(GenericAPIView):
     queryset = User.objects.all()
@@ -94,11 +94,11 @@ class LogoutView(GenericAPIView):
     def get(self, request):
         if request.user.is_authenticated:
             auth_logout(request)
-        return redirect('/smartphone-smartprice/login')
+        return redirect('login')
 
 def get_phones():
     url = "https://en.wikipedia.org/wiki/List_of_Android_smartphones"
-    resp = requests.get(url)
+    resp = requests.get(url, verify=False)
     soup = BeautifulSoup(resp.text, "html.parser")
 
     tables = soup.find_all("table", class_="wikitable")
@@ -218,6 +218,11 @@ def get_phones():
             for i in range(len(v)):
                 phones.append(k+" "+str(v[i]))
     phones.remove("iPhone")
+    phones.remove("Release date")
+    phones.remove("Samsung Galaxy A51 A71")
+    phones.remove("Samsung Galaxy A51 A71 5G")
+    phones.remove("Samsung Galaxy A52 A52 5G")
+    phones.append("Samsung Galaxy A71")
 
     return phones
 
@@ -274,7 +279,9 @@ class PttTableView(GenericAPIView):
 
         # phone_table
         fetch = (self.get_queryset()
-        .filter(title=title, storage=storage, sold=0, price__gt=1000)
+        .filter(title=title, storage=storage, sold=0, price__gt=1000, price__lt=99999)
+        .exclude(storage__isnull=True)
+        .exclude(price__isnull=True)
         .order_by('-created_at'))
 
         serializer = self.serializer_class(fetch, many=True)
@@ -303,7 +310,7 @@ class PttPriceGraphView(GenericAPIView):
                   min_price=Min('price'), 
                   max_price=Max('price'),
                   id=Max('id', output_field=IntegerField()))
-        .filter(title=title, storage=storage, price__gt=1000)
+        .filter(title=title, storage=storage, price__gt=1000, price__lt=99999)
         .exclude(storage__isnull=True)
         .exclude(price__isnull=True)
         .order_by('date'))
@@ -314,9 +321,10 @@ class PttPriceGraphView(GenericAPIView):
         fetch = (self.get_queryset()
         .annotate(date=Cast('created_at', output_field=DateField()), 
                   avg_price_30=Round(Avg('price', output_field=FloatField()), 0))
-        .filter(title=title, storage=storage, price__gt=1000, date__gt=datetime.now().date()-timedelta(days=30))
+        .filter(title=title, storage=storage, price__gte=1000, date__gte=datetime.now().date()-timedelta(days=30), price__lt=99999)
         .exclude(storage__isnull=True)
         .exclude(price__isnull=True))
+        print(fetch.query)
 
         if len(fetch) > 0:
             avg_price_30 = fetch[0].avg_price_30
@@ -357,7 +365,7 @@ class PttStorageGraphView(GenericAPIView):
                   min_price=Min('price'), 
                   max_price=Max('price'),
                   id=Max('id', output_field=IntegerField()))
-        .filter(title=title, price__gt=1000)
+        .filter(title=title, price__gt=1000, price__lt=99999)
         .exclude(storage__isnull=True)
         .exclude(price__isnull=True)
         .order_by('storage', 'date'))
@@ -383,7 +391,7 @@ class SaleView(GenericAPIView):
 
     def get(self, request):
         if not request.user.is_authenticated:
-            return redirect('/smartphone-smartprice/home') 
+            return redirect('home') 
         form = SaleForm()
         context = {
         'form': form
@@ -425,7 +433,7 @@ class SaleView(GenericAPIView):
             messages.success(request, 'Add Product successfully!')
         else:
             messages.error(request, 'Something went wrong. Please try again!')
-        return redirect('/smartphone-smartprice/sale') 
+        return redirect('sale') 
 
 
 class CommentsView(GenericAPIView):
@@ -435,32 +443,35 @@ class CommentsView(GenericAPIView):
         title = request.GET.get('title')
         db_coll = db["sentiment"]
         fetch = [sample for sample in db_coll.find({ "title" : title })]
-        doc_score = [ d["doc"]["score"] for d in fetch ]
-        doc_mag = [ d["doc"]["magnitude"] for d in fetch ]
-        doc = {"score": round(sum(doc_score)/len(doc_score), 2), "magnitude": round(sum(doc_mag)/len(doc_mag), 2)}
-        sentences = []
-        for d in fetch:
-            sentences.extend(d["sentences"])
+        if len(fetch) > 0:
+            doc_score = [ d["doc"]["score"] for d in fetch ]
+            doc_mag = [ d["doc"]["magnitude"] for d in fetch ]
+            doc = {"score": round(sum(doc_score)/len(doc_score), 2)*20, "magnitude": round(sum(doc_mag)/len(doc_mag), 2)}
+            sentences = []
+            for d in fetch:
+                sentences.extend(d["sentences"])
 
-        for d in sentences:
-            temp = []
-            if "<" in d["content"]:
-                lst = d["content"].split("<")
-                for i in lst:
-                    if ">" not in i:
-                        temp.append(i)
-                d["content"] = "，".join(temp)
+            for d in sentences:
+                temp = []
+                if "<" in d["content"]:
+                    lst = d["content"].split("<")
+                    for i in lst:
+                        if ">" not in i:
+                            temp.append(i)
+                    d["content"] = "，".join(temp)
 
 
-        sentences = sorted([ (d["content"], d["score"], d["magnitude"]) for d in sentences 
-                              if abs(d["score"]) >= 0.5 and abs(d["magnitude"]) >= 0.5 and len(d["content"]) > 5 ],
-                    key=lambda x: x[1], reverse=True)
-        goods = [i[0] for i in sentences if i[1] > 0]
-        bads = [i[0] for i in sentences if i[1] < 0]
-        arc_title = [ d["arc_title"] for d in fetch ]
-        link = [ "https://www.ptt.cc/"+d["link"] for d in fetch ]
-        data = {"doc":doc, "goods": goods, "bads": bads, "arc_title": arc_title, "link": link}
-        
+            sentences = sorted([ (d["content"], d["score"], d["magnitude"]) for d in sentences 
+                                if abs(d["score"]) >= 0.5 and abs(d["magnitude"]) >= 0.5 and len(d["content"]) > 5 ],
+                        key=lambda x: x[1], reverse=True)
+            goods = [i[0] for i in sentences if i[1] > 0]
+            bads = [i[0] for i in sentences if i[1] < 0]
+            arc_title = [ d["arc_title"] for d in fetch ]
+            link = [ "https://www.ptt.cc/"+d["link"] for d in fetch ]
+            data = {"doc":doc, "goods": goods, "bads": bads, "arc_title": arc_title, "link": link}
+        else:
+            data = {}
+            
         return JsonResponse(data, json_dumps_params={'ensure_ascii':False})
 
 
@@ -471,7 +482,7 @@ class ProfileView(GenericAPIView):
 
     def get(self, request):
         if not request.user.is_authenticated:
-            return redirect('/smartphone-smartprice/login')
+            return redirect('login')
         current_user = request.user
         fetch = self.queryset.all().filter(account=current_user.username, source="native")
         serializer = self.serializer_class(fetch, many=True)
@@ -489,7 +500,7 @@ class PostView(GenericAPIView):
 
     def get(self, request, id):
         if not request.user.is_authenticated:
-            return redirect('/smartphone-smartprice/login')
+            return redirect('login')
         id = request.path.split('/')[-1]
         print(id)
         fetch = get_object_or_404(Ptt, pk=id)
@@ -502,3 +513,8 @@ class PostView(GenericAPIView):
         }
         return render(request, 'post.html', context)
         # return JsonResponse(data, json_dumps_params={'ensure_ascii':False}, safe=False)
+
+ssl_file = env.SSL_FILE
+def get_ssl_file(request):
+    file = open(ssl_file).read()
+    return HttpResponse(file)

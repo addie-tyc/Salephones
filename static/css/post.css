@@ -1,0 +1,14 @@
+#sale-post img{
+    width: 70%;
+    height: auto;
+    margin: auto;
+}
+
+.m-left {
+    margin-left: 3%;
+}
+
+.row {
+    margin-top: 3%;
+    font-size: 20px;
+}

@@ -20,21 +20,25 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from smartphone_app import views
+import env
+
+ssl_path = env.SSL_PATH
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('smartphone-smartprice/home', views.home_page),
-    path('smartphone-smartprice/detail/<str:title>/<int:storage>', views.detail_page),
-    path('smartphone-smartprice/profile', views.profile_page),
-    path('smartphone-smartprice/signup', views.SignUpView.as_view(), name="signup"),
-    path('smartphone-smartprice/login', views.LoginView.as_view(), name="login"),
-    path('smartphone-smartprice/logout', views.LogoutView.as_view(), name="logout"),
-    path('smartphone-smartprice/sale', views.SaleView.as_view(), name="sale"),
-    path('smartphone-smartprice/post/<int:id>', views.PostView.as_view()),
+    path('home', views.home_page, name="home"),
+    path('detail/<str:title>/<int:storage>', views.detail_page),
+    path('profile', views.profile_page),
+    path('signup', views.SignUpView.as_view(), name="signup"),
+    path('login', views.LoginView.as_view(), name="login"),
+    path('logout', views.LogoutView.as_view(), name="logout"),
+    path('sale', views.SaleView.as_view(), name="sale"),
+    path('post/<int:id>', views.PostView.as_view()),
     path('api/v1/home', views.PttHomeView.as_view()),
     path('api/v1/table', views.PttTableView.as_view()),
     path('api/v1/price-graph', views.PttPriceGraphView.as_view()),
     path('api/v1/storage-graph', views.PttStorageGraphView.as_view()),
     path('api/v1/comments', views.CommentsView.as_view()),
     path('api/v1/profile', views.ProfileView.as_view()),
+    path(ssl_path, views.get_ssl_file),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

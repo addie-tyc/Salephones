@@ -9,9 +9,9 @@ function render_products(data) {
         let d = products[i]
         newPost.className = "product row my-border-bottom justify-content-md-center"
         if (d.source === "native") {
-            d.link = `/smartphone-smartprice/post/${d.id}` 
+            d.link = `/post/${d.id}` 
         }
-        newPost.setAttribute('onclick', `document.location = '${d.link}';`);
+        newPost.setAttribute('onclick', `window.open('${d.link}')`);
         newPost.innerHTML = `
                                 <td name="price" class="col text-center">${d.price}</td>
                                 <td name="box" class="col-5">${d.box}</td>
@@ -20,6 +20,8 @@ function render_products(data) {
                              `
         productsDiv.appendChild(newPost)
         }
+    let phone_table = document.querySelector('#phone-table')
+    sorttable.makeSortable(phone_table);
 }
 
 function draw_phone_graph (data) {
@@ -77,8 +79,8 @@ function draw_phone_graph (data) {
         title: {
             text:`${phone} Price History`,
         },
-        width: 648,
-        height: 400
+        width: screen.width*0.44,
+        height: screen.width*0.44*0.5625
     }
     var data = [avg, avg_low, avg_high, new_price, avg_price_30]
     Plotly.newPlot('phone-graph', data, layout);
@@ -112,28 +114,12 @@ function draw_storage_graph (data) {
 
     }
 
-    var new_price = {
-        x: graph.date, 
-        y: graph.new_price, 
-        line: {color: 'rgb(200,100,150)'}, 
-        name: "Buy a New One Today", 
-        type: "scatter"
-      };
-
-    var avg_price_30 = {
-        x: graph.date, 
-        y: graph.avg_price_30, 
-        line: {color: 'rgb(100,200,150)'}, 
-        name: "Second-hand Avg Price <br> within 30 Days", 
-        type: "scatter"
-    };
-
     var layout = {
         title: {
             text:`${phone} Price History of different storage`,
         },
-        width: 648,
-        height: 400
+        width: screen.width*0.44,
+        height: screen.width*0.44*0.5625
     }
     Plotly.newPlot('storage-graph', data, layout);
 }
@@ -145,9 +131,10 @@ function add_storage_link(data) {
     let storage = data.storage
     let storages = Object.keys(graph)
     if (storages.length > 1) {
-        let newP = document.createElement('p')
-        newP.textContent = "參考更多："
-        linkDiv.appendChild(newP)
+        let newDiv = document.createElement('div')
+        newDiv.className = "word-div"
+        newDiv.textContent = "參考更多："
+        linkDiv.appendChild(newDiv)
     }
     let newRow = document.createElement('div')
     newRow.className = "row"
@@ -163,7 +150,7 @@ function add_storage_link(data) {
             } else {
                 var link_title = title.replaceAll(" ", "-")
             }
-            newLink.innerHTML = `<a href="/smartphone-smartprice/detail/${link_title}/${s}" class="link-reset">${title} ${s}GB</a>`
+            newLink.innerHTML = `<a href="/detail/${link_title}/${s}" class="link-reset">${title} ${s}GB</a>`
             newRow.appendChild(newLink)
         }
     }
@@ -174,54 +161,72 @@ function add_storage_link(data) {
 
 
 function render_comments(data) {
-    let commDiv = document.querySelector('#comments')
+    let commDiv = document.querySelector('#comments-div')
+    let commWord = document.querySelector('#comments-word')
     let keys = Object.keys(data)
-    if (data["doc"]["score"] >= 0) {
-        var col = 'rgb(200,100,150)' 
-    } else {
-        var col = 'rgb(0,100,150)' 
-    }
-    var senti = [{
-        type: 'bar',
-        x: [data["doc"]["score"]],
-        y: ["score"],
-        line: {color: col}, 
-        width: [1],
-        orientation: 'h'
-      }];
-    var layout = {
-        title: "網友評價情緒",
-        width: 648,
-        height: 200,
-        xaxis: {
-            range: [-0.05, 0.05],
-            },
-        yaxis:{visible: false
-        }
-    }
-    Plotly.newPlot('comments', senti, layout);
-    // var newH6 = document.createElement('h6')
-    // newH6.textContent = `平均情緒分數：${data[keys[0]]["score"]} (-1 ~ +1)`
-    // commDiv.appendChild(newH6)
-
-    
-    for (var i = 1; i < 3; i += 1) {
-        var newUl = document.createElement('ul')
-        newUl.className = `${keys[i]}-comments`
-        if (keys[i] === "goods") {
-            newUl.innerHTML = "<h5>網評推薦：</h5>"
+    if (keys.length > 0) {
+        commWord.innerHTML = `<h3 class="">怕踩雷嗎？看用過的人怎麼說</h3>`
+        // <h4>用戶回饋</h4>
+        commDiv.innerHTML = `
+                             <div id=comments-graph class="clear-float text-center board">
+                             </div>`
+        if (data["doc"]["score"] >= 0) {
+            var col = 'rgb(200,100,150)' 
         } else {
-            newUl.innerHTML = "<h5>網評不推：</h5>"
+            var col = 'rgb(0,100,150)' 
         }
-        for (var j = 1; j < keys[i].length; j += 1) {
-            var newLi = document.createElement('li')
-            newLi.textContent = data[keys[i]][j]
-            newUl.appendChild(newLi)
+        var senti = [{
+            type: 'bar',
+            x: [data["doc"]["score"]],
+            y: ["score"],
+            line: {color: col}, 
+            width: [1],
+            orientation: 'h'
+        }];
+        var layout = {
+            title: "網友評價情緒",
+            width: 648,
+            height: 200,
+            xaxis: {
+                range: [-1, 1],
+                },
+            yaxis:{visible: false
+            }
         }
-        commDiv.appendChild(newUl)
+        Plotly.newPlot('comments-graph', senti, layout);
+
+        
+        for (var i = 1; i < keys.length; i += 1) {
+    
+            if (keys[i] === "goods") {
+                var newDiv = document.createElement('div')
+                newDiv.className = `comments board float-start`
+                newDiv.innerHTML = "<h5>網友正評</h5>"
+                var newUl = document.createElement('ul')
+                for (var j = 1; j < data[keys[i]].length; j += 1) {
+                    var newLi = document.createElement('li')
+                    newLi.textContent = data[keys[i]][j]
+                    newUl.appendChild(newLi)
+                }
+                newDiv.appendChild(newUl)
+                commDiv.appendChild(newDiv)
+            } 
+            if (keys[i] === "bads") {
+                var newDiv = document.createElement('div')
+                newDiv.className = `comments board float-end`
+                newDiv.innerHTML = "<h5>網友負評</h5>"
+                var newUl = document.createElement('ul')
+                for (var j = 0; j < data[keys[i]].length; j += 1) {
+                    var newLi = document.createElement('li')
+                    newLi.textContent = data[keys[i]][j]
+                    newUl.appendChild(newLi)
+                }
+                newDiv.appendChild(newUl)
+                commDiv.appendChild(newDiv)
+            }
+        }
     }
 }
-
 
 url_array = window.location.href.split("/")
 storage = url_array.pop()

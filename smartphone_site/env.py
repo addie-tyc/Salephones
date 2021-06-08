@@ -15,3 +15,6 @@ MONGO_PWD = os.getenv('MONGO_PWD')
 
 AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_KEY")
+
+SSL_PATH = os.getenv("SSL_PATH")
+SSL_FILE = os.getenv("SSL_FILE")
