@@ -41,7 +41,7 @@ class LoginForm(forms.Form):
 
 def get_phones():
     url = "https://en.wikipedia.org/wiki/List_of_Android_smartphones"
-    resp = requests.get(url)
+    resp = requests.get(url, verify=False)
     soup = BeautifulSoup(resp.text, "html.parser")
 
     tables = soup.find_all("table", class_="wikitable")
@@ -135,8 +135,14 @@ def get_phones():
     phone_set = set()
     for p in phone_list:
         phone_set.add(p)
+    phone_list.append("Samsung Galaxy A71")
     phone_list = sorted(list(phone_set))
     phone_list.remove("Asus ROG Phone II")
+    phone_list.remove("Release date")
+    phone_list.remove("Samsung Galaxy")
+    phone_list.remove("Samsung Galaxy A51 A71")
+    phone_list.remove("Samsung Galaxy A51 A71 5G")
+    phone_list.remove("Samsung Galaxy A52 A52 5G")
     return phone_list
 
 class SaleForm(forms.ModelForm):

@@ -98,7 +98,7 @@ class LogoutView(GenericAPIView):
 
 def get_phones():
     url = "https://en.wikipedia.org/wiki/List_of_Android_smartphones"
-    resp = requests.get(url)
+    resp = requests.get(url, verify=False)
     soup = BeautifulSoup(resp.text, "html.parser")
 
     tables = soup.find_all("table", class_="wikitable")
@@ -218,6 +218,11 @@ def get_phones():
             for i in range(len(v)):
                 phones.append(k+" "+str(v[i]))
     phones.remove("iPhone")
+    phones.remove("Release date")
+    phones.remove("Samsung Galaxy A51 A71")
+    phones.remove("Samsung Galaxy A51 A71 5G")
+    phones.remove("Samsung Galaxy A52 A52 5G")
+    phones.append("Samsung Galaxy A71")
 
     return phones
 
@@ -316,9 +321,10 @@ class PttPriceGraphView(GenericAPIView):
         fetch = (self.get_queryset()
         .annotate(date=Cast('created_at', output_field=DateField()), 
                   avg_price_30=Round(Avg('price', output_field=FloatField()), 0))
-        .filter(title=title, storage=storage, price__gt=1000, date__gt=datetime.now().date()-timedelta(days=30), price__lt=99999)
+        .filter(title=title, storage=storage, price__gte=1000, date__gte=datetime.now().date()-timedelta(days=30), price__lt=99999)
         .exclude(storage__isnull=True)
         .exclude(price__isnull=True))
+        print(fetch.query)
 
         if len(fetch) > 0:
             avg_price_30 = fetch[0].avg_price_30
@@ -440,7 +446,7 @@ class CommentsView(GenericAPIView):
         if len(fetch) > 0:
             doc_score = [ d["doc"]["score"] for d in fetch ]
             doc_mag = [ d["doc"]["magnitude"] for d in fetch ]
-            doc = {"score": round(sum(doc_score)/len(doc_score), 2), "magnitude": round(sum(doc_mag)/len(doc_mag), 2)}
+            doc = {"score": round(sum(doc_score)/len(doc_score), 2)*20, "magnitude": round(sum(doc_mag)/len(doc_mag), 2)}
             sentences = []
             for d in fetch:
                 sentences.extend(d["sentences"])
