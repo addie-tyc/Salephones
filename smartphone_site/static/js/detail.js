@@ -188,7 +188,7 @@ function render_comments(data) {
             width: 648,
             height: 200,
             xaxis: {
-                range: [-0.05, 0.05],
+                range: [-1, 1],
                 },
             yaxis:{visible: false
             }

@@ -1,0 +1,195 @@
+/* header */
+
+.navbar-user {
+  background-color: beige;
+  font-size: 20px;
+  margin: 0;
+  margin-right: 5%;
+  padding: 0;
+  justify-content:flex-end;
+  height: 36px;
+  z-index: 1;
+  font-family: 'Nunito', sans-serif;
+}
+
+
+.navbar-banner {
+  margin: 0;
+  padding: 0;
+}
+
+.navbar .banner {
+  background-color: #364F7D;
+  /* background-image: url('https://aws-bucket-addie.s3-ap-northeast-1.amazonaws.com/smartphone/smartphones.jpeg');
+  background-position: 402px;
+  background-repeat: no-repeat;
+  background-size: 80% auto; */
+  height: 150px;
+  width: 100%;
+  max-width: 2000px;
+  margin: 0;
+  padding: 0;
+  justify-content:flex-start;
+}
+
+.navbar-nav li{
+  color: #FFF;
+}
+
+.user-icon {
+  height: 52px;
+  border-radius: 50%;
+}
+
+#login-user {
+  background-color:#FECC33;
+}
+
+#logout-user {
+  background-color:#888;
+}
+
+.dropdown-toggle::after {
+  display: none;
+}
+
+/* body */
+
+body {
+  background-color: beige;
+  font-family: 'Nunito', sans-serif;
+}
+
+/* brands btn */
+
+.buttons {
+  margin-top: 36px;
+}
+
+.border-pilled {
+  border: #364F7D 3px solid;
+  border-radius: 25px;
+  margin-right: 1px;
+}
+
+/* products table */
+
+.brand-logo {
+  height: 80px;
+  margin-bottom: 30px;
+}
+
+.products {
+  width: 60%;
+  margin: auto; 
+}
+
+.products-by-brand {
+  width: 95%;
+  margin: auto;
+  margin-top: 6%; 
+  margin-bottom: 3%; 
+  background-color: #fff;
+  border-radius: 15px; 
+  }
+
+.my-border-bottom:hover{
+  background:rgba(245,245,220,0.5);
+}
+
+.my-border-bottom {
+  width: 90%;
+  margin: auto;
+  margin-bottom: 26px;
+  border-bottom: #364F7D 1px solid;
+}
+
+.last-column-bottom {
+  padding-bottom: 26px;
+}
+
+.last-row {
+  border: 0;
+}
+
+.link-reset {
+  text-decoration: none;
+  color: #212529;
+}
+
+/* forms */
+.main-form {
+  background-color:#fff;
+  width: 60%;
+  margin: auto;
+  margin-top: 5%;
+  margin-bottom: 5%;
+  padding-bottom: 26px;
+}
+
+form {
+  margin-top: 16px;
+  background-color:#fff;
+}
+
+.form-control {
+  width: 50%;
+  margin: auto;
+  margin-bottom: 16px;
+}
+
+form label{
+  margin-left: 15%;
+}
+
+.btn-container {
+  text-align: center;
+} 
+
+.submit {
+  border: #364F7D 3px solid;
+  border-radius: 25px;
+  background-color: #364F7D;
+  color:  #fff;
+  margin-top: 16px;
+}
+
+/* form nav */
+.main-form nav{
+  line-height: 24px;
+}
+
+.main-form a {
+  padding: 10px;
+  margin: 10px;
+}
+
+a.current {
+  color: #364F7D;
+  border-bottom: 2px solid #364F7D;
+}
+
+/* error msg */
+.errorlist {
+  text-align: center;
+}
+
+/* success msg */
+
+.success {
+  list-style: none;
+  text-align: center;
+  width: 60%;
+  margin: auto;
+  margin-top: 26px;
+  background-color: mediumaquamarine;
+}
+
+.error {
+  list-style: none;
+  text-align: center;
+  width: 60%;
+  margin: auto;
+  margin-top: 26px;
+  background-color: rgb(250, 100, 100);
+}

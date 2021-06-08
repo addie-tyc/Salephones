@@ -1,0 +1,13 @@
+.post img{
+    width: 100%;
+    height: auto;
+}
+
+.post {
+    margin-bottom: 16px;
+}
+
+.v-center {
+    display: flex;
+    align-items: center;
+ }
