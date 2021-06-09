@@ -139,7 +139,7 @@ form {
 }
 
 form label{
-  margin-left: 15%;
+  margin-left: 25%;
 }
 
 .btn-container {
@@ -171,7 +171,12 @@ a.current {
 
 /* error msg */
 .errorlist {
+  list-style: none;
   text-align: center;
+}
+
+.errorlist li{
+  margin-bottom: 2%;
 }
 
 /* success msg */

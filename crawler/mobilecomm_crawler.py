@@ -220,7 +220,7 @@ def crawl_comm_pages():
         
         data = crawl_comm(links)
         if len(data) > 0:
-            db_coll.insert_many(data)
+            db_coll.insert_many(data, ordered=False)
         
 if __name__ == '__main__':
     crawl_comm_pages()
