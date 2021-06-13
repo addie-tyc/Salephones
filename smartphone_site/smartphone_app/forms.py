@@ -8,6 +8,11 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 
 class SignUpForm(UserCreationForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.label_suffix = ""
+
     username = forms.CharField(
         label="帳號",
         widget=forms.TextInput(attrs={'class': 'form-control'})
@@ -29,6 +34,11 @@ class SignUpForm(UserCreationForm):
         fields = ('username', 'email', 'password1', 'password2')
 
 class LoginForm(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.label_suffix = ""
+
     username = forms.CharField(
         label="帳號",
         widget=forms.TextInput(attrs={'class': 'form-control'})
@@ -146,13 +156,18 @@ def get_phones():
     return phone_list
 
 class SaleForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.label_suffix = ""
+
     phones = get_phones()
     title_choices = tuple([ (p, p) for p in phones ])
     title = forms.ChoiceField(label="手機名稱", widget=forms.Select(attrs={'class': 'form-control'}), choices=title_choices, required=True)
     storage_choices = [32, 64, 128, 256, 512, 1024]
     storage_choices = [ (i,i) for i in storage_choices ]
     storage = forms.ChoiceField(label="手機容量（GB）", widget=forms.Select(attrs={'class': 'form-control'}), choices=storage_choices, required=True)
-    price = forms.IntegerField(label="價格", widget=forms.NumberInput(attrs={'class': 'form-control'}), required=True)
+    price = forms.IntegerField(label="價格", widget=forms.NumberInput(attrs={'class': 'form-control'}), min_value=1, required=True)
     new_choices = [ (0, "已使用"), (1, "全新") ]
     new = forms.ChoiceField(label="已使用 或 全新", widget=forms.Select(attrs={'class': 'form-control'}), choices=new_choices, required=True)
     sold = forms.IntegerField(widget=forms.HiddenInput(attrs={'class': 'form-control'}), initial=0, required=True)
@@ -165,7 +180,7 @@ class SaleForm(forms.ModelForm):
     images = forms.FileField(label="商品照片（最多 4 張）", 
                              widget=forms.FileInput(
                                  attrs={'class': 'form-control', 'multiple': True, 'accept':"image/jpg, image/jpeg, image/png", 'id':"images"}),
-                             required=False)
+                             required=True)
     
 
     class Meta:

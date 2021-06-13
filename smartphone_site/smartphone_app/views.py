@@ -54,13 +54,15 @@ class SignUpView(GenericAPIView):
         form = SignUpForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Signed up successfully!')
-            redirect('login')
+            # messages.success(request, 'Signed up successfully!')
+            user = form.save()
+            auth_login(request, user)
+            return redirect('home')
         else:
             if form.errors:
                 messages.error(request, form.errors)
             else:
-                messages.error(request, 'Something went wrong. Please try again!')
+                messages.error(request, '操作有誤！請再試一次。')
         return redirect('signup') 
 
 
@@ -85,7 +87,7 @@ class LoginView(GenericAPIView):
             auth_login(request, user)
             return redirect('home')  #重新導向到首頁
         else:
-            messages.error(request, 'Something went wrong. Please try again!')
+            messages.error(request, '帳號或密碼錯誤')
         return redirect('login') 
 
 class LogoutView(GenericAPIView):
@@ -279,7 +281,7 @@ class PttTableView(GenericAPIView):
 
         # phone_table
         fetch = (self.get_queryset()
-        .filter(title=title, storage=storage, sold=0, price__gt=1000, price__lt=99999)
+        .filter(title=title, storage=storage, sold=0, price__gte=1000, price__lt=99999)
         .exclude(storage__isnull=True)
         .exclude(price__isnull=True)
         .order_by('-created_at'))
@@ -310,7 +312,7 @@ class PttPriceGraphView(GenericAPIView):
                   min_price=Min('price'), 
                   max_price=Max('price'),
                   id=Max('id', output_field=IntegerField()))
-        .filter(title=title, storage=storage, price__gt=1000, price__lt=99999)
+        .filter(title=title, storage=storage, price__gte=1000, price__lt=99999)
         .exclude(storage__isnull=True)
         .exclude(price__isnull=True)
         .order_by('date'))

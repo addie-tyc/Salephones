@@ -12,10 +12,19 @@ function render_products(data) {
             d.link = `/post/${d.id}` 
         }
         newPost.setAttribute('onclick', `window.open('${d.link}')`);
+        // newPost.innerHTML = `
+        //                         <td name="price" class="col text-center">${d.price}</td>
+        //                         <td name="box" class="col-5">${d.box}</td>
+        //                         <td name="source" class="col text-center">${d.source}</td>
+        //                         <td name="created_at" class="col text-center">${d.created_at.replace('T', ' ').replace('Z', '')}</td>
+        //                      `
+        // productsDiv.appendChild(newPost)
         newPost.innerHTML = `
                                 <td name="price" class="col text-center">${d.price}</td>
                                 <td name="box" class="col-5">${d.box}</td>
-                                <td name="source" class="col text-center">${d.source}</td>
+                                <td name="source" class="col text-center">
+                                    <img class="source-img" src="https://aws-bucket-addie.s3.ap-northeast-1.amazonaws.com/smartphone/source_logo/${d.source}.png">
+                                </td>
                                 <td name="created_at" class="col text-center">${d.created_at.replace('T', ' ').replace('Z', '')}</td>
                              `
         productsDiv.appendChild(newPost)
@@ -31,7 +40,7 @@ function draw_phone_graph (data) {
         x: graph.date, 
         y: graph.old_price, 
         line: {color: 'rgb(0,100,150)'}, 
-        name: "Second-hand Avg Price", 
+        name: "二手均價", 
         type: "scatter"
       };
       
@@ -41,8 +50,8 @@ function draw_phone_graph (data) {
         fill: "tonexty", 
         fillcolor: 'rgba(68, 68, 68, 0.2)', 
         line: {color: "transparent"}, 
-        marker: {color: "#444"},
-        name: "Min", 
+        marker: {color: "#222"},
+        name: "當日最低價", 
         showlegend: false, 
         type: "scatter"
     };
@@ -53,8 +62,8 @@ function draw_phone_graph (data) {
         fill: "tonexty", 
         fillcolor: 'rgba(68, 68, 68, 0.2)', 
         line: {color: "transparent"}, 
-        marker: {color: "#444"},
-        name: "Max", 
+        marker: {color: "#222"},
+        name: "當日最高價", 
         showlegend: false, 
         type: "scatter"
     };
@@ -63,21 +72,21 @@ function draw_phone_graph (data) {
         x: graph.date, 
         y: graph.new_price, 
         line: {color: 'rgb(200,100,150)'}, 
-        name: "Buy a New One Today", 
-        type: "scatter"
+        name: "新機價", 
+        mode: "lines"
       };
 
     var avg_price_30 = {
         x: graph.date, 
         y: graph.avg_price_30, 
         line: {color: 'rgb(100,200,150)'}, 
-        name: "Second-hand Avg Price <br> within 30 Days", 
-        type: "scatter"
+        name: "30 日內二手均價",
+        mode: "lines" 
     };
 
     var layout = {
         title: {
-            text:`${phone} Price History`,
+            text:`${phone} 歷史價格走勢`,
         },
         width: screen.width*0.44,
         height: screen.width*0.44*0.5625
@@ -116,7 +125,7 @@ function draw_storage_graph (data) {
 
     var layout = {
         title: {
-            text:`${phone} Price History of different storage`,
+            text:`${phone} 不同容量歷史價格走勢`,
         },
         width: screen.width*0.44,
         height: screen.width*0.44*0.5625
@@ -170,25 +179,42 @@ function render_comments(data) {
         commDiv.innerHTML = `
                              <div id=comments-graph class="clear-float text-center board">
                              </div>`
-        if (data["doc"]["score"] >= 0) {
-            var col = 'rgb(200,100,150)' 
+        if (data["doc"]["score"] > 0) {
+            var col = 'rgb(200,100,150)'
+            var senti = [{
+                type: 'bar',
+                x: [data["doc"]["score"]],
+                y: ["score"],
+                line: {color: col}, 
+                width: [1],
+                orientation: 'h'
+            }]; 
+        } else if (data["doc"]["score"] < 0) {
+            var col = 'rgb(0,100,150)'
+            var senti = [{
+                type: 'bar',
+                x: [data["doc"]["score"]],
+                y: ["score"],
+                line: {color: col}, 
+                width: [1],
+                orientation: 'h'
+            }];  
         } else {
-            var col = 'rgb(0,100,150)' 
+            var col = 'rgb(200,100,150)'
+            var senti = [{
+                type: 'scatter',
+                x: [data["doc"]["score"]],
+                y: ["score"],
+                line: {color: col},
+                marker: { size: 12 } 
+            }];
         }
-        var senti = [{
-            type: 'bar',
-            x: [data["doc"]["score"]],
-            y: ["score"],
-            line: {color: col}, 
-            width: [1],
-            orientation: 'h'
-        }];
         var layout = {
             title: "網友評價情緒",
             width: 648,
             height: 200,
             xaxis: {
-                range: [-0.05, 0.05],
+                range: [-1, 1],
                 },
             yaxis:{visible: false
             }

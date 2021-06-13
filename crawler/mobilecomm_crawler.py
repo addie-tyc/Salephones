@@ -232,7 +232,7 @@ def crawl_comm_pages():
         
         data = crawl_comm(links)
         if len(data) > 0:
-            db_coll.insert_many(data)
+            db_coll.insert_many(data, ordered=False)
 
 def crawl_mobile01(year=2021):
     url = f"https://www.mobile01.com/newslist.php?type=1&c=16&date={year}"
