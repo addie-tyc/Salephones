@@ -81,12 +81,20 @@ class Ptt():
         db = self.db
         cursor = db.cursor(pymysql.cursors.DictCursor)
         cursor.executemany('''
-                          INSERT IGNORE INTO ptt
-                          (`title`, `storage`, `price`, `new`, `sold`, 
-                           `box`, `link`, `created_at`, `source`)
-                          VALUES (%s, %s, %s, %s, %s,
-                                  %s, %s, %s, %s) 
-                          ''', data)
+                            INSERT INTO ptt
+                            (`title`, `storage`, `price`, `new`, `sold`, 
+                                `box`, `link`, `created_at`, `source`)
+                            VALUES (%s, %s, %s, %s, %s,
+                                    %s, %s, %s, %s) AS new_values
+                            ON DUPLICATE KEY UPDATE title = new_values.title, 
+                                                    storage = new_values.storage, 
+                                                    price = new_values.price, 
+                                                    new = new_values.new, 
+                                                    sold = new_values.sold, 
+                                                    box = new_values.box, 
+                                                    created_at = new_values.created_at, 
+                                                    source = new_values.source;
+                            ''', data)
         db.commit()
         db.close()
 

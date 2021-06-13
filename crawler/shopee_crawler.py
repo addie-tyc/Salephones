@@ -7,6 +7,7 @@ import time
 import random
 import re
 from collections import defaultdict
+import os
 
 from crawler_model import Ptt
 
@@ -14,7 +15,7 @@ def gen_header_search(keyword):
     ua = UserAgent()
     fakeua = ua.random
     headers = {
-    'user-agent': fakeua,
+    'User-Agent': fakeua,
     'x-api-source': 'pc',
     'referer': f'https://shopee.tw/search?keyword={urllib.parse.quote(keyword)}'
     }
@@ -24,7 +25,7 @@ def gen_header(referer):
     ua = UserAgent()
     fakeua = ua.random
     headers = {
-    'user-agent': fakeua,
+    'User-Agent': fakeua,
     'x-api-source': 'pc',
     'referer': referer
     }
@@ -106,7 +107,9 @@ def make_phone_dict():
                             phone_dict[b].append(phone)
                         phone_dict[b].append(phone)
     phone_dict["Asus"].append("ROG Phone 2")
+    phone_dict["Asus"].remove("ROG Phone II")
     phone_dict.pop("Galaxy")
+    phone_dict.pop("Release")
 
     url = "https://www.theiphonewiki.com/wiki/List_of_iPhones"
     resp = requests.get(url)
@@ -124,13 +127,117 @@ def make_phone_dict():
                 iphones.append(span.text)
     iphones = sorted(iphones, reverse=True)
     phone_dict["iPhone"] = iphones
+    phone_dict["Samsung"].append("A71")
 
     for k in phone_dict.keys():
         phone_dict[k] = sorted(phone_dict[k], key=lambda x: len(x), reverse=True)
 
     return phone_dict
 
-proxy_lst = ['http://tihyjcyk-dest:sr9mbjac4xab@45.15.223.0:9018', 'http://tihyjcyk-dest:sr9mbjac4xab@45.146.180.69:9139', 'http://tihyjcyk-dest:sr9mbjac4xab@107.152.222.227:9250', 'http://tihyjcyk-dest:sr9mbjac4xab@45.128.247.174:7675', 'http://tihyjcyk-dest:sr9mbjac4xab@107.152.197.223:8245', 'http://tihyjcyk-dest:sr9mbjac4xab@45.94.47.121:8165', 'http://tihyjcyk-dest:sr9mbjac4xab@181.177.91.167:8740', 'http://tihyjcyk-dest:sr9mbjac4xab@144.168.241.216:8810', 'http://tihyjcyk-dest:sr9mbjac4xab@85.209.130.100:7641', 'http://tihyjcyk-dest:sr9mbjac4xab@45.142.28.114:8125', 'http://tihyjcyk-dest:sr9mbjac4xab@45.137.84.15:7065', 'http://tihyjcyk-dest:sr9mbjac4xab@91.246.193.60:6317', 'http://tihyjcyk-dest:sr9mbjac4xab@45.154.56.114:7132', 'http://tihyjcyk-dest:sr9mbjac4xab@91.246.194.18:6531', 'http://tihyjcyk-dest:sr9mbjac4xab@193.23.253.69:7641', 'http://tihyjcyk-dest:sr9mbjac4xab@193.27.10.145:6230', 'http://tihyjcyk-dest:sr9mbjac4xab@5.154.253.30:8288', 'http://tihyjcyk-dest:sr9mbjac4xab@185.95.157.83:6104', 'http://tihyjcyk-dest:sr9mbjac4xab@45.128.245.61:9072', 'http://tihyjcyk-dest:sr9mbjac4xab@193.5.251.127:7634', 'http://tihyjcyk-dest:sr9mbjac4xab@45.154.58.50:7563', 'http://tihyjcyk-dest:sr9mbjac4xab@109.207.130.19:8026', 'http://tihyjcyk-dest:sr9mbjac4xab@45.9.122.183:8264', 'http://tihyjcyk-dest:sr9mbjac4xab@2.56.101.189:8721', 'http://tihyjcyk-dest:sr9mbjac4xab@45.154.58.133:7646', 'http://tihyjcyk-dest:sr9mbjac4xab@185.245.27.157:6930', 'http://tihyjcyk-dest:sr9mbjac4xab@5.157.130.247:8251', 'http://tihyjcyk-dest:sr9mbjac4xab@185.245.27.137:6910', 'http://tihyjcyk-dest:sr9mbjac4xab@37.35.40.139:8229', 'http://tihyjcyk-dest:sr9mbjac4xab@176.116.231.146:7488', 'http://tihyjcyk-dest:sr9mbjac4xab@91.246.192.118:6119', 'http://tihyjcyk-dest:sr9mbjac4xab@193.27.23.101:9189', 'http://tihyjcyk-dest:sr9mbjac4xab@200.0.61.246:6321', 'http://tihyjcyk-dest:sr9mbjac4xab@176.116.230.111:7197', 'http://tihyjcyk-dest:sr9mbjac4xab@185.245.26.2:6519', 'http://tihyjcyk-dest:sr9mbjac4xab@200.0.61.74:6149', 'http://tihyjcyk-dest:sr9mbjac4xab@37.35.41.124:8470', 'http://tihyjcyk-dest:sr9mbjac4xab@185.205.194.228:7748', 'http://tihyjcyk-dest:sr9mbjac4xab@193.8.231.198:9204', 'http://tihyjcyk-dest:sr9mbjac4xab@45.154.244.47:8085', 'http://tihyjcyk-dest:sr9mbjac4xab@84.21.188.31:8565', 'http://tihyjcyk-dest:sr9mbjac4xab@64.43.91.183:6954', 'http://tihyjcyk-dest:sr9mbjac4xab@64.43.90.82:6597', 'http://tihyjcyk-dest:sr9mbjac4xab@185.95.157.166:6187', 'http://tihyjcyk-dest:sr9mbjac4xab@45.137.43.35:7589', 'http://tihyjcyk-dest:sr9mbjac4xab@185.205.194.175:7695', 'http://tihyjcyk-dest:sr9mbjac4xab@45.154.84.72:8123', 'http://tihyjcyk-dest:sr9mbjac4xab@85.209.129.127:8667', 'http://tihyjcyk-dest:sr9mbjac4xab@200.0.61.213:6288', 'http://tihyjcyk-dest:sr9mbjac4xab@45.155.70.242:8252', 'http://tihyjcyk-dest:sr9mbjac4xab@45.137.40.176:8729', 'http://tihyjcyk-dest:sr9mbjac4xab@37.35.40.188:8278', 'http://tihyjcyk-dest:sr9mbjac4xab@176.116.230.61:7147', 'http://tihyjcyk-dest:sr9mbjac4xab@45.87.249.192:7770', 'http://tihyjcyk-dest:sr9mbjac4xab@37.35.40.185:8275', 'http://tihyjcyk-dest:sr9mbjac4xab@5.154.253.219:8477', 'http://tihyjcyk-dest:sr9mbjac4xab@5.157.130.77:8081', 'http://tihyjcyk-dest:sr9mbjac4xab@45.131.212.146:6195', 'http://tihyjcyk-dest:sr9mbjac4xab@5.154.253.155:8413', 'http://tihyjcyk-dest:sr9mbjac4xab@176.116.231.110:7452', 'http://tihyjcyk-dest:sr9mbjac4xab@193.23.253.82:7654', 'http://tihyjcyk-dest:sr9mbjac4xab@45.92.247.84:6592', 'http://tihyjcyk-dest:sr9mbjac4xab@45.130.60.81:9608', 'http://tihyjcyk-dest:sr9mbjac4xab@85.209.129.114:8654', 'http://tihyjcyk-dest:sr9mbjac4xab@45.131.212.68:6117', 'http://tihyjcyk-dest:sr9mbjac4xab@45.72.55.105:7142', 'http://tihyjcyk-dest:sr9mbjac4xab@2.56.101.175:8707', 'http://tihyjcyk-dest:sr9mbjac4xab@85.209.130.145:7686', 'http://tihyjcyk-dest:sr9mbjac4xab@45.86.15.18:8565', 'http://tihyjcyk-dest:sr9mbjac4xab@5.154.253.114:8372', 'http://tihyjcyk-dest:sr9mbjac4xab@193.23.253.88:7660', 'http://tihyjcyk-dest:sr9mbjac4xab@193.23.253.115:7687', 'http://tihyjcyk-dest:sr9mbjac4xab@45.72.55.201:7238', 'http://tihyjcyk-dest:sr9mbjac4xab@45.72.55.127:7164', 'http://tihyjcyk-dest:sr9mbjac4xab@45.72.55.200:7237', 'http://tihyjcyk-dest:sr9mbjac4xab@45.72.55.174:7211', 'http://tihyjcyk-dest:sr9mbjac4xab@45.130.60.129:9656', 'http://tihyjcyk-dest:sr9mbjac4xab@45.130.60.228:9755', 'http://tihyjcyk-dest:sr9mbjac4xab@45.130.60.123:9650', 'http://tihyjcyk-dest:sr9mbjac4xab@2.56.101.136:8668', 'http://tihyjcyk-dest:sr9mbjac4xab@45.92.247.166:6674', 'http://tihyjcyk-dest:sr9mbjac4xab@45.131.212.244:6293', 'http://tihyjcyk-dest:sr9mbjac4xab@185.95.157.190:6211', 'http://tihyjcyk-dest:sr9mbjac4xab@45.87.249.197:7775', 'http://tihyjcyk-dest:sr9mbjac4xab@185.95.157.131:6152', 'http://tihyjcyk-dest:sr9mbjac4xab@45.131.212.246:6295', 'http://tihyjcyk-dest:sr9mbjac4xab@45.87.249.15:7593', 'http://tihyjcyk-dest:sr9mbjac4xab@45.92.247.197:6705', 'http://tihyjcyk-dest:sr9mbjac4xab@2.56.101.219:8751', 'http://tihyjcyk-dest:sr9mbjac4xab@45.130.60.107:9634', 'http://tihyjcyk-dest:sr9mbjac4xab@185.95.157.117:6138', 'http://tihyjcyk-dest:sr9mbjac4xab@45.131.212.138:6187', 'http://tihyjcyk-dest:sr9mbjac4xab@45.92.247.141:6649', 'http://tihyjcyk-dest:sr9mbjac4xab@45.92.247.241:6749', 'http://tihyjcyk-dest:sr9mbjac4xab@45.87.249.249:7827', 'http://tihyjcyk-dest:sr9mbjac4xab@193.151.160.57:8144', 'http://tihyjcyk-dest:sr9mbjac4xab@193.151.160.143:8230', 'http://tihyjcyk-dest:sr9mbjac4xab@193.151.161.119:8462', 'http://tihyjcyk-dest:sr9mbjac4xab@193.151.161.60:8403']
+proxy_lst = ['http://tihyjcyk-dest:sr9mbjac4xab@193.8.231.209:9215',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@107.152.177.67:6087',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.57.168.196:7200',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@138.122.194.254:7330',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@104.144.26.137:8667',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.154.244.123:8161',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@185.102.50.157:7240',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@5.154.253.240:8498',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@185.242.94.107:6192',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@5.154.253.113:8371',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@185.242.95.181:6522',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@5.157.130.161:8165',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@194.33.61.45:8628',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.130.60.93:9620',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@194.33.61.44:8627',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.154.84.190:8241',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@91.246.195.28:6797',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.137.80.64:9084',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@37.35.40.21:8111',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@64.43.90.245:6760',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.140.14.98:8114',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.136.231.236:7292',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@182.54.239.228:8245',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@176.116.231.240:7582',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@64.43.90.91:6606',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@193.151.160.34:8121',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@193.27.10.54:6139',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.136.231.128:7184',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.72.55.91:7128',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@185.102.48.143:6225',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@182.54.239.8:8025',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.94.47.183:8227',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.140.13.98:9111',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@185.102.48.186:6268',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@194.31.162.173:7689',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.131.212.36:6085',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.87.249.71:7649',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@5.154.253.123:8381',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.72.55.118:7155',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@185.242.94.47:6132',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@185.242.93.101:8441',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@37.35.41.215:8561',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@37.35.43.48:8906',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@5.154.254.244:5255',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@193.151.160.198:8285',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@5.157.130.1:8005',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@192.156.217.96:7170',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@193.23.253.161:7733',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.137.40.128:8681',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@192.156.217.58:7132',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.131.212.215:6264',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.72.55.37:7074',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@193.8.215.188:8207',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@192.153.171.192:6265',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@193.23.253.152:7724',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@5.157.130.70:8074',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.92.247.229:6737',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.72.55.80:7117',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.130.60.202:9729',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@192.153.171.10:6083',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@193.23.253.52:7624',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@176.116.231.126:7468',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@193.23.253.236:7808',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.131.212.76:6125',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@193.8.215.211:8230',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.137.40.12:8565',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@193.151.161.60:8403',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@193.151.161.111:8454',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@193.151.161.116:8459',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@5.157.130.189:8193',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@176.116.231.117:7459',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.131.213.90:7638',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.87.249.101:7679',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.87.249.140:7718',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@5.154.253.215:8473',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@192.198.126.10:7053',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.130.60.42:9569',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@5.157.131.212:8472',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.130.60.105:9632',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.131.212.251:6300',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.131.212.194:6243',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.130.60.76:9603',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.92.247.31:6539',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@176.116.230.220:7306',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@193.8.231.204:9210',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@5.154.253.209:8467',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.92.247.187:6695',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.87.249.235:7813',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@193.8.231.129:9135',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@2.56.101.231:8763',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.92.247.176:6684',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@2.56.101.12:8544',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@2.56.101.69:8601',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@195.158.192.228:8805',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@195.158.192.241:8818',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@45.92.247.189:6697',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@85.209.129.154:8694',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@2.56.101.122:8654',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@85.209.130.132:7673',
+ 'http://tihyjcyk-dest:sr9mbjac4xab@193.8.231.21:9027']
+# proxy_lst = []
+# with open(os.getcwd()+"/crawler/free_proxy.csv") as file:
+#     for row in file:
+#         proxy_lst.append("http://" + row.strip())
 
 phone_dict = make_phone_dict()
 phone_brand_set = set()
@@ -151,20 +258,11 @@ def get_title_storage(phone_dict=phone_dict, iphone_matches=iphone_matches, titl
         title = "Xiaomi" + " " + title
     elif ("三星" in title.lower()) and ("samsung" in title.lower()):
         title = "Samsung" + " " + title
-    elif ("zenfone" in title.lower()) and ("asus" not in title.lower()):
+    elif ( "zenfone" in title.lower() or "rog" in title.lower() ) and ("asus" not in title.lower()):
         title = "Asus" + " " + title
 
     title = " ".join(re.findall(r"[a-zA-Z0-9+]+", title))
     storage = None
-    if "rog" in title.lower():
-        for phone in phone_dict["Asus"]:
-            if phone.lower().replace(" ", "") in title.lower().replace(" ", ""):
-                for s in  ["32", "64", "128", "256", "512"]:
-                    if s in title:
-                        storage = int(s)
-                        break
-                title = "Asus" + " " + phone
-                break
 
     samsung_matches = ["note20ultra", "s20ultra", "s21ultra"]
     if any(x in title.lower().replace(" ", "") for x in samsung_matches):
@@ -218,15 +316,26 @@ def crawl_shopee(proxy_lst=proxy_lst, end=5000, step=50):
     init = time.time()
     random.shuffle(proxy_lst)
     proxy_chosen = proxy_lst[:int(end/step)]
-    i = 2550
-    while i < end:
-        p = proxy_chosen[int(i/step)%100]
+    i = 1050
+    headers = gen_header_search(keyword)
+    s = requests.Session()
+    s.keep_alive = False
+    s.trust_env = False
+    url = 'https://shopee.tw/api/v4/search/product_labels'
+    p = proxy_chosen[int(i/step)]
+    proxies = {"http": p, "https": p}
+    try:
+        r = s.get(url, headers=headers, proxies=proxies)
+    except requests.exceptions.ProxyError:
+        proxy_chosen.pop(int(i/step))
+        proxy_chosen.append(proxy_chosen[int(i/step)-1])
+        p = proxy_chosen[int(i/step)]
         proxies = {"http": p, "https": p}
-        headers = gen_header_search(keyword)
-        s = requests.Session()
-        url = 'https://shopee.tw/api/v4/search/product_labels'
         r = s.get(url, headers=headers, proxies=proxies)
 
+    while i < end:
+        p = proxy_chosen[int(i/step)]
+        proxies = {"http": p, "https": p}
         base_url = 'https://shopee.tw/api/v2/search_items/'
         query = f"by=relevancy&conditions=used&keyword={keyword}&limit={step}&newest={i}&order=desc&page_type=search&min_price=2000&scenario=PAGE_GLOBAL_SEARCH&skip_autocorrect=1&version=2"
 
@@ -237,10 +346,10 @@ def crawl_shopee(proxy_lst=proxy_lst, end=5000, step=50):
             res_json = r.json()
             items = sorted(res_json["items"], key=lambda d: d["ctime"])
             if items[-1]["ctime"] > datetime.timestamp(datetime.now()):
-                time.sleep(30)
-                proxy_chosen.pop(int(i/step)%100)
-                proxy_chosen.append(random.choice(proxy_lst))
+                proxy_chosen.pop(int(i/step))
+                proxy_chosen.append(proxy_chosen[int(i/step)-1])
                 print("Take a rest!")
+                time.sleep(30)
             else:   
                 for d in items:
                     if int(d["price"]/100000) > 2000:
