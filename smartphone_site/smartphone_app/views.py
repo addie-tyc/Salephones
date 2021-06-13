@@ -501,8 +501,6 @@ class PostView(GenericAPIView):
     serializer_class = ProfileSerializer
 
     def get(self, request, id):
-        if not request.user.is_authenticated:
-            return redirect('login')
         id = request.path.split('/')[-1]
         print(id)
         fetch = get_object_or_404(Ptt, pk=id)
