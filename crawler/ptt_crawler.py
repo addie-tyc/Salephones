@@ -187,13 +187,13 @@ def crawl_mobilesales(links, page, sold, phone_dict, raw_data, data, error_links
                 except IndexError:
                     title = info[2]
 
-                if ("小米" in title.lower()) or ("redmi" in title.lower()) or ("poco" in title.lower()):
-                    title = "Xiaomi" + " " + title
-                if ("紅米" in title.lower()):
+                if ("紅米" in title.lower()) or ("redmi" in title.lower()):
                     title = "Redmi" + " " + title
-                if ("三星" in title.lower()) and ("samsung" in title.lower()):
+                elif ("小米" in title.lower()) or ("poco" in title.lower()):
+                    title = "Xiaomi" + " " + title
+                elif ("三星" in title.lower()) and ("samsung" in title.lower()):
                     title = "Samsung" + " " + title
-                if ("zenfone" in title.lower()) and ("asus" not in title.lower()):
+                elif ("zenfone" in title.lower()) and ("asus" not in title.lower()):
                     title = "Asus" + " " + title
 
                 title = " ".join(re.findall(r"[a-zA-Z0-9+]+", title))
@@ -497,16 +497,79 @@ def main_macshop(last_page, max_page, phone_dict):
     print(len(error_links))
     print(error_links)
 
-if __name__ == '__main__':
+def update_ptt_unsold(links):
+    data = []
     phone_dict = make_phone_dict()
-    iphone_matches = make_iphone_matches(phone_dict)
-    last_page = get_last_page("mobilesales")
-    max_page = Ptt().select_max_page_number("mobilesales") or 20300
-    main_mobilesales(last_page, max_page, phone_dict)
+    for i in range(8001, len(links)):
+        d = links[i]
+        url = d["link"]
+        headers = {"Origin": "https://www.ptt.cc",
+            "Referer": "https://fonts.googleapis.com/",
+            "sec-ch-ua-mobile": "?0",
+            "User-Agent": "Mozilla/5.0 (Windows NT 4.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"}
+            
+        resp = requests.get(url, headers=headers)
+        if "200" in str(resp):
+            try:
+                soup = BeautifulSoup(resp.text, "html.parser")
 
-    last_page = get_last_page("MacShop")
-    max_page = Ptt().select_max_page_number("MacShop") or 18900
-    main_macshop(last_page, max_page, phone_dict["iPhone"])
+                # sold
+                body = soup.find("body")
+                if "已售" in body or "售出" in body or "已出售" in body:
+                    sold = True
+                else:
+                    sold = False
+
+                # price
+                try:
+                    wording = "價格"
+                    price = re.findall(r'售價格.+\n', str(soup.find("div", id="main-content")))
+                    if len(price) == 0:
+                        wording = "金額"
+                        price = re.findall(r'售金額.+\n', str(soup.find("div", id="main-content")))
+                    price = price[0].strip().replace(",", "")
+                    price = int(re.search(r'\d+', price).group())
+                except IndexError:
+                    if wording == "金額":
+                        price = re.findall(r'售金額.+', str(soup.find("div", id="main-content")).replace("\n", "").replace(",", "").replace(" ", ""))
+                        price = int(re.findall(r'\d+', price)[0])
+                    else:
+                        price = re.findall(r'售價格.+', str(soup.find("div", id="main-content")).replace("\n", "").replace(",", "").replace(" ", ""))[0].strip()
+                        price = int(re.findall(r'\d+', price)[0])
+                except AttributeError:
+                    sold = True
+                    price = d["price"]
+                data.append((price, sold, url))
+            except:
+                print(url)
+                data.append((d["price"], True, d["link"]))
+        else:
+            data.append((d["price"], True, d["link"]))
+
+        if i%1000 == 0:
+            db = Ptt()
+            db.update_post(data)
+            print("Insert {} Success.".format(i))
+            data = []
+        elif i%100 == 0:
+            print(i)
+    db = Ptt()
+    db.update_post(data)
+    print("Insert {} Success.".format(i))
+    data = []    
+
+if __name__ == '__main__':
+    # phone_dict = make_phone_dict()
+    # iphone_matches = make_iphone_matches(phone_dict)
+    # last_page = get_last_page("mobilesales")
+    # max_page = Ptt().select_max_page_number("mobilesales") or 20300
+    # main_mobilesales(last_page, max_page, phone_dict)
+
+    # last_page = get_last_page("MacShop")
+    # max_page = Ptt().select_max_page_number("MacShop") or 18900
+    # main_macshop(last_page, max_page, phone_dict["iPhone"])
+    links = Ptt().select_unsold_links()
+    update_ptt_unsold(links)
 
 # airflow users create \
 #     --username admin \

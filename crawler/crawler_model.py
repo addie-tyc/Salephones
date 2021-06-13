@@ -39,6 +39,31 @@ class Ptt():
         db.commit()
         db.close()
 
+    def update_post(self, data):
+        db = self.db
+        db.ping()
+        cursor = db.cursor()
+        cursor.executemany('''
+        INSERT INTO ptt
+        (`price`, `sold`, `link`)
+        VALUES (%s, %s, %s)
+        ON DUPLICATE KEY UPDATE `price` = VALUES(`price`), 
+                                `sold` = VALUES(`sold`);
+        ''', data)
+        db.commit()
+        db.close()
+
+    def select_unsold_links(self):
+        db = self.db
+        cursor = db.cursor(pymysql.cursors.DictCursor)
+        cursor.execute('''
+                       SELECT price, link FROM ptt
+                        WHERE sold = 0 AND price IS NOT NULL AND storage IS NOT NULL AND link IS NOT NULL
+                       ''')
+        result = cursor.fetchall()
+        db.close()
+        return result
+
 
     def select_max_page_number(self, source):
         db = self.db
@@ -51,6 +76,27 @@ class Ptt():
         max_page = result["max_page"]
         db.close()
         return max_page
+
+    def insert_shopee(self, data):
+        db = self.db
+        cursor = db.cursor(pymysql.cursors.DictCursor)
+        cursor.executemany('''
+                            INSERT INTO ptt
+                            (`title`, `storage`, `price`, `new`, `sold`, 
+                                `box`, `link`, `created_at`, `source`)
+                            VALUES (%s, %s, %s, %s, %s,
+                                    %s, %s, %s, %s) AS new_values
+                            ON DUPLICATE KEY UPDATE title = new_values.title, 
+                                                    storage = new_values.storage, 
+                                                    price = new_values.price, 
+                                                    new = new_values.new, 
+                                                    sold = new_values.sold, 
+                                                    box = new_values.box, 
+                                                    created_at = new_values.created_at, 
+                                                    source = new_values.source;
+                            ''', data)
+        db.commit()
+        db.close()
 
 class Landtop():
 
