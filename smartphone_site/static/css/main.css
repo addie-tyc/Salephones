@@ -1,7 +1,7 @@
 /* header */
 
 .navbar-user {
-  background-color: beige;
+  background-color: #EFEFEF;
   font-size: 20px;
   margin: 0;
   margin-right: 5%;
@@ -56,7 +56,7 @@
 /* body */
 
 body {
-  background-color: beige;
+  background-color: #EFEFEF;
   font-family: 'Nunito', sans-serif;
 }
 
@@ -70,6 +70,11 @@ body {
   border: #364F7D 3px solid;
   border-radius: 25px;
   margin-right: 1px;
+}
+
+.buttons .btn:hover {
+  background-color: #364F7C;
+  color: #FFF;
 }
 
 /* products table */
@@ -94,14 +99,14 @@ body {
   }
 
 .my-border-bottom:hover{
-  background:rgba(245,245,220,0.5);
+  background:rgba(254,219,64,0.2);
 }
 
 .my-border-bottom {
   width: 90%;
   margin: auto;
   margin-bottom: 26px;
-  border-bottom: #364F7D 1px solid;
+  border-bottom: rgba(54, 79, 125, 0.5) 1px solid;
 }
 
 .last-column-bottom {

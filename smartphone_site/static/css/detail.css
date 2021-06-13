@@ -1,7 +1,7 @@
 /* header */
 
 .navbar-user {
-  background-color: beige;
+  background-color: #EFEFEF;
   font-size: 20px;
   margin: 0;
   margin-right: 5%;
@@ -59,7 +59,7 @@
 /* body */
 
 body {
-  background-color: beige;
+  background-color: #EFEFEF;
   font-family: 'Nunito', sans-serif;
 }
 
@@ -150,8 +150,8 @@ thead tr th:hover {
 }
 
 tbody tr:hover { 
-  background: rgba(245,245,220,0.5);
-  cursor: pointer; 
+  background: rgba(254,219,64,0.2);
+  cursor: pointer;
 }
 
 tbody tr {
@@ -162,7 +162,11 @@ tbody tr {
   width: 90%;
   margin: auto;
   margin-bottom: 26px;
-  border-bottom: #2b506e 1px solid;
+  border-bottom: rgba(54, 79, 125, 0.5) 1px solid;
+}
+
+.source-img {
+  height: 2em;
 }
 
 
