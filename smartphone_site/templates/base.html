@@ -22,7 +22,7 @@
                     <li><a class="dropdown-item" href="{% url 'logout' %}">登出</a></li>
                 </ul>
             </div>
-            <div id=username class="text-center">{{ user }}</div>
+            <div id=username class="">{{ user }}</div>
         {% else %}
             <div class="nav-item nav-link"><a class="text-center" href="{% url 'login' %}"><img src="https://aws-bucket-addie.s3-ap-northeast-1.amazonaws.com/smartphone/user.png" class="user-icon" id="logout-user"></a></div>
         {% endif %}
