@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, QueryDict
 from rest_framework.views import APIView
 from rest_framework.generics import GenericAPIView
 from bs4 import BeautifulSoup
@@ -12,6 +12,7 @@ from django.core.files.storage import FileSystemStorage
 from rest_framework import serializers
 from django.conf import settings
 import boto3
+from ratelimit.decorators import ratelimit
 
 
 from datetime import datetime, timedelta
@@ -33,10 +34,22 @@ def home_page(request):
 def detail_page(request, title, storage):
     return render(request, 'detail.html')
 
-def profile_page(request):
-    if not request.user.is_authenticated:
-        return redirect('login') 
-    return render(request, 'profile.html')
+class ProfilePageView(GenericAPIView):
+    queryset = Ptt.objects.all()
+    serializer_class = PttSerializer
+
+    def get(self, request):
+        if not request.user.is_authenticated:
+            return redirect('login') 
+        return render(request, 'profile.html')
+
+    def post(self, request):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        id = request.POST.get('id')
+        print(id)
+        Ptt.objects.filter(id=id).update(sold=True)
+        return redirect('profile')
 
 class SignUpView(GenericAPIView):
     queryset = User.objects.all()
@@ -54,7 +67,6 @@ class SignUpView(GenericAPIView):
         form = SignUpForm(request.POST)
         if form.is_valid():
             form.save()
-            # messages.success(request, 'Signed up successfully!')
             user = form.save()
             auth_login(request, user)
             return redirect('home')
@@ -401,7 +413,7 @@ class SaleView(GenericAPIView):
         return render(request, 'sale.html', context)
 
     def post(self, request):
-        form = SaleForm(request.POST)
+        form = SaleForm(request.POST, request.FILES)
         current_user = request.user
         print(form.errors)
         if form.is_valid():
@@ -421,20 +433,24 @@ class SaleView(GenericAPIView):
             for i in range(len(files)):
                 upload_folder = "smartphone-images/"
                 filename = upload_folder + current_user.username + "_" + str(int(datetime.timestamp(sale.created_at))) +f"_{i}.jpg"
-                f= fs.save(filename, files[i])
+                f = fs.save(filename, files[i])
                 # the fileurl variable now contains the url to the file. This can be used to serve the file when needed.
                 fileurl = fs.url(f)
                 upload_path = str(settings.BASE_DIR) + fileurl
                 s3_bucket.upload_file(upload_path, filename, ExtraArgs={'ContentType': 'image/png', 'ACL':'public-read'})
                 image_url = "https://aws-bucket-addie.s3.amazonaws.com/" + filename
                 images.append(image_url)
+                os.system(f'rm -rf {upload_path}')
 
             sale.images = ",".join(images)
                 
             sale.save()
-            messages.success(request, 'Add Product successfully!')
+            messages.success(request, '上架商品成功')
         else:
-            messages.error(request, 'Something went wrong. Please try again!')
+            if form.errors:
+                messages.error(request, form.errors)
+            else:
+                messages.error(request, '喔嗚，出錯了，請再試一次。')
         return redirect('sale') 
 
 
@@ -496,17 +512,15 @@ class ProfileView(GenericAPIView):
         return JsonResponse(data, json_dumps_params={'ensure_ascii':False}, safe=False)
 
 
+
 class PostView(GenericAPIView):
     queryset = Ptt.objects.all()
     serializer_class = ProfileSerializer
 
     def get(self, request, id):
-        if not request.user.is_authenticated:
-            return redirect('login')
         id = request.path.split('/')[-1]
         print(id)
         fetch = get_object_or_404(Ptt, pk=id)
-        # fetch = self.queryset.all().get(pk=id)
         serializer = self.serializer_class(fetch)
         data = serializer.data
         data["images"] = data["images"].split(",")
@@ -514,7 +528,6 @@ class PostView(GenericAPIView):
         'data': data
         }
         return render(request, 'post.html', context)
-        # return JsonResponse(data, json_dumps_params={'ensure_ascii':False}, safe=False)
 
 ssl_file = env.SSL_FILE
 def get_ssl_file(request):

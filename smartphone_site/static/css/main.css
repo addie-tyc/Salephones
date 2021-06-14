@@ -12,6 +12,14 @@
   font-family: 'Nunito', sans-serif;
 }
 
+.navbar {
+  align-items: flex-start;
+}
+
+#username {
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
 
 .navbar-banner {
   margin: 0;
@@ -20,10 +28,6 @@
 
 .navbar .banner {
   background-color: #364F7D;
-  /* background-image: url('https://aws-bucket-addie.s3-ap-northeast-1.amazonaws.com/smartphone/smartphones.jpeg');
-  background-position: 402px;
-  background-repeat: no-repeat;
-  background-size: 80% auto; */
   height: 150px;
   width: 100%;
   max-width: 2000px;

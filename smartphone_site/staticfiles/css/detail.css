@@ -12,10 +12,14 @@
   font-family: 'Nunito', sans-serif;
 }
 
-/* #username {
-  display: table;
-  vertical-align: top;
-} */
+.navbar {
+  align-items: flex-start;
+}
+
+#username {
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
 
 .navbar-banner {
   margin: 0;
