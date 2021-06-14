@@ -401,7 +401,7 @@ class SaleView(GenericAPIView):
         return render(request, 'sale.html', context)
 
     def post(self, request):
-        form = SaleForm(request.POST)
+        form = SaleForm(request.POST, request.FILES)
         current_user = request.user
         print(form.errors)
         if form.is_valid():
@@ -432,9 +432,12 @@ class SaleView(GenericAPIView):
             sale.images = ",".join(images)
                 
             sale.save()
-            messages.success(request, 'Add Product successfully!')
+            messages.success(request, '上架商品成功')
         else:
-            messages.error(request, 'Something went wrong. Please try again!')
+            if form.errors:
+                messages.error(request, form.errors)
+            else:
+                messages.error(request, '喔嗚，出錯了，請再試一次。')
         return redirect('sale') 
 
 
