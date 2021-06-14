@@ -12,6 +12,7 @@ from django.core.files.storage import FileSystemStorage
 from rest_framework import serializers
 from django.conf import settings
 import boto3
+from ratelimit.decorators import ratelimit
 
 
 from datetime import datetime, timedelta
@@ -41,7 +42,7 @@ class ProfilePageView(GenericAPIView):
         if not request.user.is_authenticated:
             return redirect('login') 
         return render(request, 'profile.html')
-    
+
     def post(self, request):
         if not request.user.is_authenticated:
             return redirect('login')
@@ -432,13 +433,14 @@ class SaleView(GenericAPIView):
             for i in range(len(files)):
                 upload_folder = "smartphone-images/"
                 filename = upload_folder + current_user.username + "_" + str(int(datetime.timestamp(sale.created_at))) +f"_{i}.jpg"
-                f= fs.save(filename, files[i])
+                f = fs.save(filename, files[i])
                 # the fileurl variable now contains the url to the file. This can be used to serve the file when needed.
                 fileurl = fs.url(f)
                 upload_path = str(settings.BASE_DIR) + fileurl
                 s3_bucket.upload_file(upload_path, filename, ExtraArgs={'ContentType': 'image/png', 'ACL':'public-read'})
                 image_url = "https://aws-bucket-addie.s3.amazonaws.com/" + filename
                 images.append(image_url)
+                os.system(f'rm -rf {upload_path}')
 
             sale.images = ",".join(images)
                 
@@ -519,7 +521,6 @@ class PostView(GenericAPIView):
         id = request.path.split('/')[-1]
         print(id)
         fetch = get_object_or_404(Ptt, pk=id)
-        # fetch = self.queryset.all().get(pk=id)
         serializer = self.serializer_class(fetch)
         data = serializer.data
         data["images"] = data["images"].split(",")
@@ -527,7 +528,6 @@ class PostView(GenericAPIView):
         'data': data
         }
         return render(request, 'post.html', context)
-        # return JsonResponse(data, json_dumps_params={'ensure_ascii':False}, safe=False)
 
 ssl_file = env.SSL_FILE
 def get_ssl_file(request):
