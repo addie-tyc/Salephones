@@ -12,7 +12,6 @@ from django.core.files.storage import FileSystemStorage
 from rest_framework import serializers
 from django.conf import settings
 import boto3
-from ratelimit.decorators import ratelimit
 
 
 from datetime import datetime, timedelta

@@ -1,0 +1,89 @@
+# Smartphone-Smartprice/smartphone_site/manage.py: 11
+# Smartphone-Smartprice/smartphone_site/smartphone_app/admin.py: 1
+# Smartphone-Smartprice/smartphone_site/smartphone_app/apps.py: 1
+# Smartphone-Smartprice/smartphone_site/smartphone_app/forms.py: 1,2,3
+# Smartphone-Smartprice/smartphone_site/smartphone_app/migrations/0001_initial.py: 3
+# Smartphone-Smartprice/smartphone_site/smartphone_app/migrations/0002_auto_20210519_0410.py: 3
+# Smartphone-Smartprice/smartphone_site/smartphone_app/migrations/0003_auto_20210519_0415.py: 3
+# Smartphone-Smartprice/smartphone_site/smartphone_app/migrations/0004_pttlandtop_smartphoneappptt.py: 3
+# Smartphone-Smartprice/smartphone_site/smartphone_app/migrations/0005_delete_smartphoneappptt.py: 3
+# Smartphone-Smartprice/smartphone_site/smartphone_app/migrations/0006_auto_20210529_1704.py: 3
+# Smartphone-Smartprice/smartphone_site/smartphone_app/migrations/0007_auto_20210530_0529.py: 3
+# Smartphone-Smartprice/smartphone_site/smartphone_app/migrations/0008_ptt_status.py: 3
+# Smartphone-Smartprice/smartphone_site/smartphone_app/models.py: 8
+# Smartphone-Smartprice/smartphone_site/smartphone_app/tests.py: 1
+# Smartphone-Smartprice/smartphone_site/smartphone_app/views.py: 9,10,11,13
+# Smartphone-Smartprice/smartphone_site/smartphone_site/asgi.py: 12
+# Smartphone-Smartprice/smartphone_site/smartphone_site/urls.py: 17,19,20
+# Smartphone-Smartprice/smartphone_site/smartphone_site/wsgi.py: 12
+Django == 3.1
+
+# Smartphone-Smartprice/crawler/crawler_model.py: 2
+Flask == 1.1.2
+
+# Smartphone-Smartprice/crawler/crawler_model.py: 4
+PyJWT == 1.7.1
+
+# Smartphone-Smartprice/crawler/crawler_model.py: 3
+# Smartphone-Smartprice/crawler/mobilesales_crawler.ipynb: 775
+# Smartphone-Smartprice/smartphone_site/smartphone_site/__init__.py: 1
+PyMySQL == 1.0.2
+
+# Smartphone-Smartprice/crawler/landtop_crawler.py: 2
+# Smartphone-Smartprice/crawler/macshop_crawler.ipynb: 2
+# Smartphone-Smartprice/crawler/mobilecomm_crawler.ipynb: 2
+# Smartphone-Smartprice/crawler/mobilecomm_crawler.py: 2
+# Smartphone-Smartprice/crawler/mobilesales_crawler.ipynb: 2
+# Smartphone-Smartprice/crawler/ptt_crawler.py: 2
+# Smartphone-Smartprice/smartphone_site/smartphone_app/forms.py: 7
+# Smartphone-Smartprice/smartphone_site/smartphone_app/views.py: 5
+beautifulsoup4 == 4.8.2
+
+# Smartphone-Smartprice/smartphone_site/smartphone_app/views.py: 14
+boto3 == 1.17.46
+
+# Smartphone-Smartprice/smartphone_site/smartphone_app/serializers.py: 1
+# Smartphone-Smartprice/smartphone_site/smartphone_app/views.py: 3,4,12
+# Smartphone-Smartprice/smartphone_site/smartphone_site/urls.py: 18
+djangorestframework == 3.12.4
+
+# Smartphone-Smartprice/crawler/landtop_crawler.py: 3
+# Smartphone-Smartprice/crawler/macshop_crawler.ipynb: 3
+# Smartphone-Smartprice/crawler/mobilecomm_crawler.ipynb: 3
+# Smartphone-Smartprice/crawler/mobilecomm_crawler.py: 3
+# Smartphone-Smartprice/crawler/mobilesales_crawler.ipynb: 3
+# Smartphone-Smartprice/crawler/ptt_crawler.py: 3
+# Smartphone-Smartprice/crawler/shopee_crawler.ipynb: 4,30
+fake_useragent == 0.1.11
+
+# Smartphone-Smartprice/crawler/mobilecomm_crawler.ipynb: 4
+# Smartphone-Smartprice/crawler/mobilecomm_crawler.py: 4
+google_resumable_media == 1.2.0
+
+# Smartphone-Smartprice/crawler/mobilecomm_crawler.py: 5
+# Smartphone-Smartprice/smartphone_site/smartphone_app/models.py: 9
+pymongo == 3.11.3
+
+# Smartphone-Smartprice/crawler/crawler_model.py: 1
+# Smartphone-Smartprice/crawler/mobilecomm_crawler.py: 6
+# Smartphone-Smartprice/crawler/mobilesales_crawler.ipynb: 766
+# Smartphone-Smartprice/smartphone_site/env.py: 1
+# Smartphone-Smartprice/smartphone_site/smartphone_site/settings.py: 14
+python_dotenv == 0.15.0
+
+# Smartphone-Smartprice/crawler/crawler_model.py: 6
+pytz == 2019.3
+
+# Smartphone-Smartprice/crawler/landtop_crawler.py: 1
+# Smartphone-Smartprice/crawler/macshop_crawler.ipynb: 1
+# Smartphone-Smartprice/crawler/mobilecomm_crawler.ipynb: 1
+# Smartphone-Smartprice/crawler/mobilecomm_crawler.py: 1
+# Smartphone-Smartprice/crawler/mobilesales_crawler.ipynb: 1
+# Smartphone-Smartprice/crawler/ptt_crawler.py: 1
+# Smartphone-Smartprice/crawler/shopee_crawler.ipynb: 1,27
+# Smartphone-Smartprice/smartphone_site/smartphone_app/forms.py: 6
+# Smartphone-Smartprice/smartphone_site/smartphone_app/views.py: 18
+requests == 2.24.0
+
+# Smartphone-Smartprice/crawler/mobilecomm_crawler.ipynb: 240
+sentifish == 1.11.4
