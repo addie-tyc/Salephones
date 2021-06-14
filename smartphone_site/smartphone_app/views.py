@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, QueryDict
 from rest_framework.views import APIView
 from rest_framework.generics import GenericAPIView
 from bs4 import BeautifulSoup
@@ -33,10 +33,22 @@ def home_page(request):
 def detail_page(request, title, storage):
     return render(request, 'detail.html')
 
-def profile_page(request):
-    if not request.user.is_authenticated:
-        return redirect('login') 
-    return render(request, 'profile.html')
+class ProfilePageView(GenericAPIView):
+    queryset = Ptt.objects.all()
+    serializer_class = PttSerializer
+
+    def get(self, request):
+        if not request.user.is_authenticated:
+            return redirect('login') 
+        return render(request, 'profile.html')
+    
+    def post(self, request):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        id = request.POST.get('id')
+        print(id)
+        Ptt.objects.filter(id=id).update(sold=True)
+        return redirect('profile')
 
 class SignUpView(GenericAPIView):
     queryset = User.objects.all()
@@ -54,7 +66,6 @@ class SignUpView(GenericAPIView):
         form = SignUpForm(request.POST)
         if form.is_valid():
             form.save()
-            # messages.success(request, 'Signed up successfully!')
             user = form.save()
             auth_login(request, user)
             return redirect('home')
@@ -497,6 +508,7 @@ class ProfileView(GenericAPIView):
         data = {"user_info": {"username": username, "email": email},
                 "sale_post": sale_post}
         return JsonResponse(data, json_dumps_params={'ensure_ascii':False}, safe=False)
+
 
 
 class PostView(GenericAPIView):
