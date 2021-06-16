@@ -1,7 +1,7 @@
 /* header */
 
 .navbar-user {
-  background-color: beige;
+  background-color: #EFEFEF;
   font-size: 20px;
   margin: 0;
   margin-right: 5%;
@@ -12,10 +12,14 @@
   font-family: 'Nunito', sans-serif;
 }
 
-/* #username {
-  display: table;
-  vertical-align: top;
-} */
+.navbar {
+  align-items: flex-start;
+}
+
+#username {
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
 
 .navbar-banner {
   margin: 0;
@@ -59,7 +63,7 @@
 /* body */
 
 body {
-  background-color: beige;
+  background-color: #EFEFEF;
   font-family: 'Nunito', sans-serif;
 }
 
@@ -150,8 +154,8 @@ thead tr th:hover {
 }
 
 tbody tr:hover { 
-  background: rgba(245,245,220,0.5);
-  cursor: pointer; 
+  background: rgba(254,219,64,0.2);
+  cursor: pointer;
 }
 
 tbody tr {
@@ -162,7 +166,11 @@ tbody tr {
   width: 90%;
   margin: auto;
   margin-bottom: 26px;
-  border-bottom: #2b506e 1px solid;
+  border-bottom: rgba(54, 79, 125, 0.5) 1px solid;
+}
+
+.source-img {
+  height: 2em;
 }
 
 
@@ -234,7 +242,7 @@ tbody tr {
   padding-bottom: 20px;
 }
 
-ul {
+.comments ul {
   height: 200px;
   overflow: scroll;
 }

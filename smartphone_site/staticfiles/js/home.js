@@ -5,8 +5,9 @@ function filter_brand(brand) {
     if (button.css('backgroundColor') === "rgb(54, 79, 125)") {
         for (var i = 0; i < products.length; i += 1) {
             products[i].style = ''
-            button.css("backgroundColor", "beige")
-            button.css("color", "#212529")
+            button.removeAttr("style")
+            // button.css("backgroundColor", "beige")
+            // button.css("color", "#212529")
         }
     } else {
         for (var i = 0; i < products.length; i += 1) {
@@ -16,8 +17,9 @@ function filter_brand(brand) {
                 button.css("color", "#fff")
             } else {
                 products[i].style = 'display:none'
-                $(`#${products[i].id}-button`).css("backgroundColor", "beige")
-                $(`#${products[i].id}-button`).css("color", "#212529")
+                $(`#${products[i].id}-button`).removeAttr("style")
+                // $(`#${products[i].id}-button`).css("backgroundColor", "beige")
+                // $(`#${products[i].id}-button`).css("color", "#212529")
                 }
             }
     }
