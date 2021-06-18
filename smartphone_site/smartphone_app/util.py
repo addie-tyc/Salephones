@@ -118,7 +118,7 @@ def get_phones():
         rows.extend(i.select("tbody tr th"))
 
     phones = [a.text.partition("(")[0].strip() for a in rows]
-    phones = [ p for p in phones if len(phone.split()) > 1]
+    phones = [ phone for phone in phones if len(phone.split()) > 1]
 
     brands = set()
     for phone in phones:

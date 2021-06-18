@@ -156,7 +156,6 @@ class PttHomeView(GenericAPIView):
     serializer_class = PttSerializer
 
     def get(self, request, *args, **krgs):
-        start = time.time()
         phones = get_phones()
         fetch = (self.get_queryset()
         .values('title', 
@@ -183,7 +182,6 @@ class PttHomeView(GenericAPIView):
                 phone["storage"] = str(phone["storage"]) + "GB"
                 result[phone["title"].split(" ")[0]].append(phone)
 
-        print(time.time() - start)
         return JsonResponse({"products": result}, json_dumps_params={'ensure_ascii':False})
 
 
@@ -260,7 +258,6 @@ class PttPriceGraphView(GenericAPIView):
                 price__lt=PRICE_CEIL)
         .exclude(storage__isnull=True)
         .exclude(price__isnull=True))
-        print(fetch.query)
 
         if len(fetch) > 0:
             avg_price_30 = fetch[0].avg_price_30
@@ -341,7 +338,6 @@ class SaleView(GenericAPIView):
     def post(self, request):
         form = SaleForm(request.POST, request.FILES)
         current_user = request.user
-        print(form.errors)
         if form.is_valid():
             sale = form.save(commit=False)
 
@@ -389,11 +385,12 @@ class CommentsView(GenericAPIView):
     def get(self, request, *args, **krgs):
         title = request.GET.get('title')
         db_coll = db["sentiment"]
+        max_score = db_coll.find_one(sort=[("doc.score", -1)])["doc"]["score"]
         fetch = [ sample for sample in db_coll.find({"title" : title}) ]
         if len(fetch) > 0:
             doc_score = [ d["doc"]["score"] for d in fetch ]
             doc_mag = [ d["doc"]["magnitude"] for d in fetch ]
-            doc = {"score": round(sum(doc_score)/len(doc_score), 2) * SENTIMENT_SCALAR, 
+            doc = {"score": round( (sum(doc_score)/len(doc_score)) / max_score, 2 ), 
                    "magnitude": round(sum(doc_mag)/len(doc_mag), 2)}
 
             sentences = []
