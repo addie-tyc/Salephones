@@ -23,15 +23,26 @@ import os
 from .models import Ptt, Landtop, db
 from .serializers import PttSerializer, LandtopSerializer, PttDetailSerializer, PttGraphSerializer, ProfileSerializer
 from .forms import SignUpForm, LoginForm, SaleForm
+from .util import get_phones
 import env
+
+PRICE_FLOOR = 1000
+PRICE_CEIL = 99999
+PRICE_DAYS_PERIOD = 30
+IS_NOT_NEW = 0
+IS_NOT_SOLD = 0
+UTC_8 = 8
+SENTIMENT_SCALAR = 20
 
 # pages
 
 def home_page(request):
     return render(request, 'home.html')
 
+
 def detail_page(request, title, storage):
     return render(request, 'detail.html')
+
 
 class ProfilePageView(GenericAPIView):
     queryset = Ptt.objects.all()
@@ -46,9 +57,9 @@ class ProfilePageView(GenericAPIView):
         if not request.user.is_authenticated:
             return redirect('login')
         id = request.POST.get('id')
-        print(id)
         Ptt.objects.filter(id=id).update(sold=True)
         return redirect('profile')
+
 
 class SignUpView(GenericAPIView):
     queryset = User.objects.all()
@@ -101,6 +112,7 @@ class LoginView(GenericAPIView):
             messages.error(request, '帳號或密碼錯誤')
         return redirect('login') 
 
+
 class LogoutView(GenericAPIView):
     queryset = User.objects.all()
 
@@ -109,136 +121,30 @@ class LogoutView(GenericAPIView):
             auth_logout(request)
         return redirect('login')
 
-def get_phones():
-    url = "https://en.wikipedia.org/wiki/List_of_Android_smartphones"
-    resp = requests.get(url, verify=False)
-    soup = BeautifulSoup(resp.text, "html.parser")
 
-    tables = soup.find_all("table", class_="wikitable")
-    rows = []
-    for i in tables:
-        rows.extend(i.select("tbody tr th"))
+class PostView(GenericAPIView):
+    queryset = Ptt.objects.all()
+    serializer_class = ProfileSerializer
 
-    phones = [a.text.partition("(")[0].strip() for a in rows]
-    phones = [ p for p in phones if len(p.split()) > 1]
+    def get(self, request, id):
+        id = request.path.split('/')[-1]
+        fetch = get_object_or_404(Ptt, pk=id)
+        serializer = self.serializer_class(fetch)
+        data = serializer.data
+        data["images"] = data["images"].split(",")
+        context = {
+        'data': data
+        }
+        return render(request, 'post.html', context)
 
-    brands = set()
-    for p in phones:
-        brands.add(p.split(" ")[0])
-    brands = list(brands)
-    brands = sorted(brands)
-    for b in range(len(brands)):
-        if brands[b] == "Asus":
-            brands = brands[b:]
-            break
 
-    phone_dict = defaultdict(list)
-    for b in brands:
-        if b == "Samsung":
-            for p in phones:
-                if p.split(" ")[0] == b:
-                    if "/" in p:
-                        p_lst = p.split("/")
-                        for series in p_lst[1:]:
-                            sub_p = p_lst[0].replace(b + " Galaxy", "").replace("5G", "").strip()
-                            if series == "+":
-                                phone = sub_p + series
-                            else:
-                                phone = sub_p + " " + series
-                            if len(phone) > 0:
-                                phone_dict[b].append(phone)
-                        phone_dict[b].append(sub_p)
-                    else:
-                        phone = p.replace(b + " Galaxy", "").replace("5G", "").strip()
-                        if len(phone) > 0:
-                            phone_dict[b].append(phone)
-        elif b == "POCO":
-            for p in phones:
-                if p.split(" ")[0] == b:
-                    phone = p.replace("5G", "").strip()
-                    if len(phone) > 0:
-                        phone_dict["Xiaomi"].append(phone)
-        elif b == "Developer":
-            for p in phones:
-                if p.split(" ")[0] == b:
-                    if "/" in p:
-                        p_lst = p.split("/")
-                        for series in p_lst[1:]:
-                            sub_p = p_lst[0].replace(b, "").replace("5G", "").strip()
-                            if series == "+":
-                                phone = sub_p + series
-                            else:
-                                phone = sub_p + " " + series
-                            if len(phone) > 0:
-                                phone_dict[b].append(phone)
-                        phone_dict[b].append(sub_p)
-                    else:
-                        phone = p.replace(b, "").replace("5G", "").strip()
-                        if len(phone) > 0:
-                            phone_dict[b].append(phone)
-                        phone_dict[b].append(phone)
-        else:
-            for p in phones:
-                if p.split(" ")[0] == b:
-                    if "/" in p:
-                        p_lst = p.split("/")
-                        for series in p_lst[1:]:
-                            sub_p = p_lst[0].replace(b, "").replace("5G", "").strip()
-                            if series == "+":
-                                phone = sub_p + series
-                            else:
-                                phone = sub_p + " " + series
-                            if len(phone) > 0:
-                                phone_dict[b].append(phone)
-                        phone_dict[b].append(sub_p)
-                    else:
-                        phone = p.replace(b, "").replace("5G", "").strip()
-                        if len(phone) > 0:
-                            phone_dict[b].append(phone)
-                        phone_dict[b].append(phone)
-    phone_dict["Asus"].append("ROG Phone 2")
-    phone_dict.pop("Galaxy")
-
-    url = "https://www.theiphonewiki.com/wiki/List_of_iPhones"
-    resp = requests.get(url, verify=False)
-    soup = BeautifulSoup(resp.text, "html.parser")
-
-    table = soup.find("div", id="toc")
-    iphones = []
-    for span in table.select("ul li span"):
-        if "iPhone" in str(span):
-            if ("SE" in str(span)) and ("1" in str(span)):
-                iphones.append("iPhone SE")
-            elif ("SE" in str(span)) and ("2" in str(span)):
-                iphones.append("iPhone SE2")
-            else:
-                iphones.append(span.text)
-    phone_dict["iPhone"] = iphones
-
-    for k in phone_dict.keys():
-        phone_dict[k] = sorted(phone_dict[k], key=lambda x: len(x), reverse=True)
+ssl_file = env.SSL_FILE
+def get_ssl_file(request):
+    file = open(ssl_file).read()
+    return HttpResponse(file)
     
-    brands = list(phone_dict.keys())
-    phones = []
-    for k, v in phone_dict.items():
-        if k == "Samsung":
-            for i in range(len(v)):
-                phones.append(k+" Galaxy "+str(v[i]))
-        elif k == "iPhone":
-            for i in range(len(v)):
-                phones.append(str(v[i]))
-        else:
-            for i in range(len(v)):
-                phones.append(k+" "+str(v[i]))
-    phones.remove("iPhone")
-    phones.remove("Release date")
-    phones.remove("Samsung Galaxy A51 A71")
-    phones.remove("Samsung Galaxy A51 A71 5G")
-    phones.remove("Samsung Galaxy A52 A52 5G")
-    phones.append("Samsung Galaxy A71")
 
-    return phones
-
+# APIs
 
 class Round(Func):
     function = 'ROUND'
@@ -246,7 +152,6 @@ class Round(Func):
 
 
 class PttHomeView(GenericAPIView):
-
     queryset = Ptt.objects.all().prefetch_related("landtop")
     serializer_class = PttSerializer
 
@@ -254,24 +159,29 @@ class PttHomeView(GenericAPIView):
         start = time.time()
         phones = get_phones()
         fetch = (self.get_queryset()
-        .values('title', 'storage')
+        .values('title', 
+                'storage')
         .annotate(old_price=Round(Avg('price', output_field=FloatField()), 0), 
-                    id=Max('id', output_field=IntegerField()),
-                    new_price=Min('landtop__price', output_field=IntegerField()))
-        .filter(price__gte=1000, new=0, title__in=phones, created_at__gte=datetime.now()-timedelta(days=30))
+                  id=Max('id', output_field=IntegerField()),
+                  new_price=Min('landtop__price', 
+                  output_field=IntegerField()))
+        .filter(price__gte=PRICE_FLOOR, 
+                new=IS_NOT_NEW, 
+                title__in=phones, 
+                created_at__gte=datetime.now()-timedelta(days=PRICE_DAYS_PERIOD))
         .exclude(storage__isnull=True)
         .exclude(price__isnull=True)
         .order_by('title'))
 
         serializer = self.serializer_class(fetch, many=True)
-        data = serializer.data
+        phones = serializer.data
         result = defaultdict(list)
-        for d in data:
-            if not d["new_price"]:
-                d["new_price"] = "No data"
-            if d["storage"]:
-                d["storage"] = str(d["storage"]) + "GB"
-                result[d["title"].split(" ")[0]].append(d)
+        for phone in phones:
+            if not phone["new_price"]:
+                phone["new_price"] = "No data"
+            if phone["storage"]:
+                phone["storage"] = str(phone["storage"]) + "GB"
+                result[phone["title"].split(" ")[0]].append(phone)
 
         print(time.time() - start)
         return JsonResponse({"products": result}, json_dumps_params={'ensure_ascii':False})
@@ -292,7 +202,11 @@ class PttTableView(GenericAPIView):
 
         # phone_table
         fetch = (self.get_queryset()
-        .filter(title=title, storage=storage, sold=0, price__gte=1000, price__lt=99999)
+        .filter(title=title, 
+                storage=storage, 
+                sold=IS_NOT_SOLD, 
+                price__gte=PRICE_FLOOR, 
+                price__lt=PRICE_CEIL)
         .exclude(storage__isnull=True)
         .exclude(price__isnull=True)
         .order_by('-created_at'))
@@ -300,7 +214,9 @@ class PttTableView(GenericAPIView):
         serializer = self.serializer_class(fetch, many=True)
         phone_table = serializer.data
             
-        return JsonResponse({"phone": phone, "title":title, "storage": storage, "phone_table": phone_table}, json_dumps_params={'ensure_ascii':False})
+        return JsonResponse({"phone": phone, "title":title, "storage": storage, "phone_table": phone_table}, 
+                             json_dumps_params={'ensure_ascii':False})
+
 
 class PttPriceGraphView(GenericAPIView):
 
@@ -319,11 +235,14 @@ class PttPriceGraphView(GenericAPIView):
         fetch = (self.get_queryset()
         .values(date=Cast('created_at', output_field=DateField()))
         .annotate(old_price=Round(Avg('price', output_field=FloatField()), 0), 
-                  new_price=Min('landtop__price', output_field=IntegerField()),
+                  new_price=Min('landtop__price', output_field=IntegerField()), 
                   min_price=Min('price'), 
-                  max_price=Max('price'),
+                  max_price=Max('price'), 
                   id=Max('id', output_field=IntegerField()))
-        .filter(title=title, storage=storage, price__gte=1000, price__lt=99999)
+        .filter(title=title, 
+                storage=storage, 
+                price__gte=PRICE_FLOOR, 
+                price__lt=PRICE_CEIL)
         .exclude(storage__isnull=True)
         .exclude(price__isnull=True)
         .order_by('date'))
@@ -334,7 +253,11 @@ class PttPriceGraphView(GenericAPIView):
         fetch = (self.get_queryset()
         .annotate(date=Cast('created_at', output_field=DateField()), 
                   avg_price_30=Round(Avg('price', output_field=FloatField()), 0))
-        .filter(title=title, storage=storage, price__gte=1000, date__gte=datetime.now().date()-timedelta(days=30), price__lt=99999)
+        .filter(title=title, 
+                storage=storage, 
+                price__gte=PRICE_FLOOR, 
+                date__gte=datetime.now().date()-timedelta(days=PRICE_DAYS_PERIOD), 
+                price__lt=PRICE_CEIL)
         .exclude(storage__isnull=True)
         .exclude(price__isnull=True))
         print(fetch.query)
@@ -344,7 +267,7 @@ class PttPriceGraphView(GenericAPIView):
         else:
             avg_price_30 = 0
 
-        phone_graph_dict = {"date": [], "old_price": [], "min_price": [], "max_price": [],
+        phone_graph_dict = {"date": [], "old_price": [], "min_price": [], "max_price": [], 
                             "new_price": [], "avg_price_30": []}
         for d in phone_graph:
             phone_graph_dict["date"].append(d["date"])
@@ -355,7 +278,9 @@ class PttPriceGraphView(GenericAPIView):
             phone_graph_dict["avg_price_30"].append(avg_price_30)
         
  
-        return JsonResponse({"phone": phone, "title":title, "storage": storage, "phone_graph": phone_graph_dict}, json_dumps_params={'ensure_ascii':False})
+        return JsonResponse({"phone": phone, "title":title, "storage": storage, "phone_graph": phone_graph_dict}, 
+                             json_dumps_params={'ensure_ascii':False})
+
 
 class PttStorageGraphView(GenericAPIView):
 
@@ -372,13 +297,14 @@ class PttStorageGraphView(GenericAPIView):
 
         # phone graph of different storage
         fetch = (self.get_queryset()
-        .values('storage', date=Cast('created_at', output_field=DateField()))
+        .values('storage', 
+                date=Cast('created_at', output_field=DateField()))
         .annotate(old_price=Round(Avg('price', output_field=FloatField()), 0), 
-                  new_price=Min('landtop__price', output_field=IntegerField()),
+                  new_price=Min('landtop__price', output_field=IntegerField()), 
                   min_price=Min('price'), 
-                  max_price=Max('price'),
+                  max_price=Max('price'), 
                   id=Max('id', output_field=IntegerField()))
-        .filter(title=title, price__gt=1000, price__lt=99999)
+        .filter(title=title, price__gte=PRICE_FLOOR, price__lt=PRICE_CEIL)
         .exclude(storage__isnull=True)
         .exclude(price__isnull=True)
         .order_by('storage', 'date'))
@@ -396,7 +322,8 @@ class PttStorageGraphView(GenericAPIView):
             storage_graph_dict[ storage_graph[i]["storage"] ]["max_price"].append(storage_graph[i]["max_price"])
             storage_graph_dict[ storage_graph[i]["storage"] ]["new_price"].append(storage_graph[i]["new_price"])
             
-        return JsonResponse({"phone": phone, "title":title, "storage": storage, "storage_graph": storage_graph_dict}, json_dumps_params={'ensure_ascii':False})
+        return JsonResponse({"phone": phone, "title":title, "storage": storage, "storage_graph": storage_graph_dict}, 
+                             json_dumps_params={'ensure_ascii':False})
 
 
 class SaleView(GenericAPIView):
@@ -407,8 +334,8 @@ class SaleView(GenericAPIView):
             return redirect('home') 
         form = SaleForm()
         context = {
-        'form': form
-        }
+            'form': form
+            }
         return render(request, 'sale.html', context)
 
     def post(self, request):
@@ -417,11 +344,13 @@ class SaleView(GenericAPIView):
         print(form.errors)
         if form.is_valid():
             sale = form.save(commit=False)
+
             # default value: sold, account, created_at, source
             sale.account = current_user.username
             sale.email = current_user.email
-            sale.created_at = datetime.utcnow().replace(microsecond=0) + timedelta(hours=8)
+            sale.created_at = datetime.utcnow().replace(microsecond=0) + timedelta(hours=UTC_8)
 
+            # images
             images = []
             files = request.FILES.getlist("images")
             s3 = boto3.resource('s3', aws_access_key_id=env.AWS_ACCESS_KEY, aws_secret_access_key=env.AWS_SECRET_ACCESS_KEY)
@@ -431,12 +360,13 @@ class SaleView(GenericAPIView):
             fs = FileSystemStorage()
             for i in range(len(files)):
                 upload_folder = "smartphone-images/"
-                filename = upload_folder + current_user.username + "_" + str(int(datetime.timestamp(sale.created_at))) +f"_{i}.jpg"
+                filename = upload_folder + current_user.username + "_" + str(int(datetime.timestamp(sale.created_at))) + f"_{i}.jpg"
                 f = fs.save(filename, files[i])
-                # the fileurl variable now contains the url to the file. This can be used to serve the file when needed.
+
                 fileurl = fs.url(f)
                 upload_path = str(settings.BASE_DIR) + fileurl
-                s3_bucket.upload_file(upload_path, filename, ExtraArgs={'ContentType': 'image/png', 'ACL':'public-read'})
+                s3_bucket.upload_file(upload_path, filename, 
+                                      ExtraArgs={'ContentType': 'image/png', 'ACL':'public-read'})
                 image_url = "https://aws-bucket-addie.s3.amazonaws.com/" + filename
                 images.append(image_url)
                 os.system(f'rm -rf {upload_path}')
@@ -459,11 +389,13 @@ class CommentsView(GenericAPIView):
     def get(self, request, *args, **krgs):
         title = request.GET.get('title')
         db_coll = db["sentiment"]
-        fetch = [sample for sample in db_coll.find({ "title" : title })]
+        fetch = [ sample for sample in db_coll.find({"title" : title}) ]
         if len(fetch) > 0:
             doc_score = [ d["doc"]["score"] for d in fetch ]
             doc_mag = [ d["doc"]["magnitude"] for d in fetch ]
-            doc = {"score": round(sum(doc_score)/len(doc_score), 2)*20, "magnitude": round(sum(doc_mag)/len(doc_mag), 2)}
+            doc = {"score": round(sum(doc_score)/len(doc_score), 2) * SENTIMENT_SCALAR, 
+                   "magnitude": round(sum(doc_mag)/len(doc_mag), 2)}
+
             sentences = []
             for d in fetch:
                 sentences.extend(d["sentences"])
@@ -478,13 +410,15 @@ class CommentsView(GenericAPIView):
                     d["content"] = "，".join(temp)
 
 
-            sentences = sorted([ (d["content"], d["score"], d["magnitude"]) for d in sentences 
-                                if abs(d["score"]) >= 0.5 and abs(d["magnitude"]) >= 0.5 and len(d["content"]) > 5 ],
-                        key=lambda x: x[1], reverse=True)
-            goods = [i[0] for i in sentences if i[1] > 0]
-            bads = [i[0] for i in sentences if i[1] < 0]
+            sentences = sorted([{"content": d["content"], "score": d["score"], "magnitude": d["magnitude"]} 
+                                for d in sentences 
+                                if abs(d["score"]) >= 0.5 and abs(d["magnitude"]) >= 0.5 and len(d["content"]) > 5], 
+                               key=lambda x: x["score"], 
+                               reverse=True)
+            goods = [sentence["content"] for sentence in sentences if sentence["score"] > 0]
+            bads = [sentence["content"] for sentence in sentences if sentence["score"] < 0]
             arc_title = [ d["arc_title"] for d in fetch ]
-            link = [ "https://www.ptt.cc/"+d["link"] for d in fetch ]
+            link = [ "https://www.ptt.cc/" + d["link"] for d in fetch ]
             data = {"doc":doc, "goods": goods, "bads": bads, "arc_title": arc_title, "link": link}
         else:
             data = {}
@@ -493,7 +427,6 @@ class CommentsView(GenericAPIView):
 
 
 class ProfileView(GenericAPIView):
-
     queryset = Ptt.objects.all()
     serializer_class = ProfileSerializer
 
@@ -509,26 +442,3 @@ class ProfileView(GenericAPIView):
         data = {"user_info": {"username": username, "email": email},
                 "sale_post": sale_post}
         return JsonResponse(data, json_dumps_params={'ensure_ascii':False}, safe=False)
-
-
-
-class PostView(GenericAPIView):
-    queryset = Ptt.objects.all()
-    serializer_class = ProfileSerializer
-
-    def get(self, request, id):
-        id = request.path.split('/')[-1]
-        print(id)
-        fetch = get_object_or_404(Ptt, pk=id)
-        serializer = self.serializer_class(fetch)
-        data = serializer.data
-        data["images"] = data["images"].split(",")
-        context = {
-        'data': data
-        }
-        return render(request, 'post.html', context)
-
-ssl_file = env.SSL_FILE
-def get_ssl_file(request):
-    file = open(ssl_file).read()
-    return HttpResponse(file)
