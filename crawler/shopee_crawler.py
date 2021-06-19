@@ -13,6 +13,8 @@ from crawler_model import Ptt
 from util import make_phone_dict, make_iphone_matches
 
 
+PRICE_FLOOR = 999
+PRICE_SCALAR = 100000 # modifying shopee price
 def gen_header_search(keyword):
     ua = UserAgent()
     fakeua = ua.random
@@ -202,10 +204,9 @@ def get_title_storage(phone_dict=phone_dict, iphone_matches=iphone_matches, titl
 def crawl_shopee(proxy_lst=proxy_lst, end=5000, step=50):
     data = []
     keyword = "二手手機"
-    init = time.time()
     random.shuffle(proxy_lst)
-    proxy_chosen = proxy_lst[:int(end/step)]
-    i = 1050
+    proxy_chosen = proxy_lst[:int(end / step)]
+    i = 0
     headers = gen_header_search(keyword)
     s = requests.Session()
     s.keep_alive = False
@@ -230,18 +231,17 @@ def crawl_shopee(proxy_lst=proxy_lst, end=5000, step=50):
 
         url = base_url + '?' + query
         r = s.get(url, headers=headers, proxies=proxies)
-        print(time.time()-init)
         if r.status_code == requests.codes.ok:
             res_json = r.json()
             items = sorted(res_json["items"], key=lambda d: d["ctime"])
             if items[-1]["ctime"] > datetime.timestamp(datetime.now()):
-                proxy_chosen.pop(int(i/step))
-                proxy_chosen.append(proxy_chosen[int(i/step)-1])
+                proxy_chosen.pop(int(i / step))
+                proxy_chosen.append(proxy_chosen[int(i / step)-1])
                 print("Take a rest!")
                 time.sleep(30)
             else:   
                 for d in items:
-                    if int(d["price"]/100000) > 2000:
+                    if int(d["price"] / PRICE_SCALAR) > PRICE_FLOOR:
                         start = time.time()
                         rf = f'https://shopee.tw/product/{d["shopid"]}/{d["itemid"]}'
                         headers = gen_header(rf)
@@ -253,7 +253,7 @@ def crawl_shopee(proxy_lst=proxy_lst, end=5000, step=50):
                                 (
                                 title,
                                 storage,
-                                (int(d["price"]/100000)), # price
+                                (int(d["price"] / PRICE_SCALAR)), # price
                                 False, # new
                                 (item["status"] == "sold_out"), # sold
                                 item["description"].replace("\n", "。"), # box
@@ -262,7 +262,6 @@ def crawl_shopee(proxy_lst=proxy_lst, end=5000, step=50):
                                 "shopee" # source
                                 ) 
                             )
-                        print(time.time()-start)
                 if i%500 == 0:
                     db = Ptt()
                     db.insert_shopee(data)
@@ -272,7 +271,6 @@ def crawl_shopee(proxy_lst=proxy_lst, end=5000, step=50):
                 print(i, len(data))
         else:
             i += step
-    print(time.time()-init)
 
 
 if __name__ == "__main__":

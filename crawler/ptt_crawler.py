@@ -29,15 +29,8 @@ def get_ptt_last_page(source):
 
 
 def get_db_last_page(source):
-    sql_hook = MySqlHook(mysql_conn_id="RDS-smartphone")
-    conn = sql_hook.get_conn()
-    conn.ping()
-    cur = conn.cursor()
-    cur.execute('''
-                    SELECT MAX(page_number) AS last_page_in_db FROM ptt
-                     WHERE source = %s
-                    ''', (source,))
-    db_last_page = int(cur.fetchone()[0])-1
+    db = Ptt()
+    db_last_page = db.select_max_page_number()
     return db_last_page
 
 
@@ -202,9 +195,8 @@ def crawl_mobilesales(links, phone_dict):
                 except IndexError:
                     box = None
                 if price:
-                    if price > 999:
-                        data.append([title, storage, price, new, sold, account, box, url, created_at, link[0], "mobilesales"])
-                        raw_data.append([url, str(soup.find("body"))]) 
+                    data.append([title, storage, price, new, sold, account, box, url, created_at, link[0], "mobilesales"])
+                    raw_data.append([url, str(soup.find("body"))]) 
             except:
                 raw_data.append([url, str(soup.find("body"))])
     return raw_data, data 
