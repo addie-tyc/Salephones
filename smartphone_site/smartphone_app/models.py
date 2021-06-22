@@ -131,7 +131,7 @@ class Landtop(models.Model):
     created_at = models.DateField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'landtop'
 
 
@@ -141,7 +141,7 @@ class RawPtt(models.Model):
     html_body = models.TextField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'raw_ptt'
 
 
@@ -174,7 +174,7 @@ class PttLandtop(models.Model):
     landtop = models.ForeignKey(Landtop, models.CASCADE)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'ptt_landtop'
 
 
