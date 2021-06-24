@@ -131,8 +131,19 @@ class Landtop(models.Model):
     created_at = models.DateField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'landtop'
+
+
+class RawPtt(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    link = models.CharField(unique=True, max_length=255, blank=True, null=True)
+    html_body = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'raw_ptt'
+
 
 class Ptt(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -151,6 +162,7 @@ class Ptt(models.Model):
     images = models.TextField(blank=True, null=True)
     status = models.TextField(blank=True, null=True)
     landtop = models.ManyToManyField(Landtop, through='PttLandtop', through_fields=('ptt', 'landtop'))
+    raw_ptt = models.ManyToManyField(RawPtt, through='PttRawPtt', through_fields=('ptt', 'raw_ptt'))
 
     class Meta:
         managed = True
@@ -162,15 +174,15 @@ class PttLandtop(models.Model):
     landtop = models.ForeignKey(Landtop, models.CASCADE)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'ptt_landtop'
 
 
-class RawPtt(models.Model):
+class PttRawPtt(models.Model):
     id = models.BigAutoField(primary_key=True)
-    link = models.CharField(unique=True, max_length=255, blank=True, null=True)
-    html_body = models.TextField(blank=True, null=True)
+    ptt = models.ForeignKey(Ptt, models.CASCADE)
+    raw_ptt = models.ForeignKey(RawPtt, models.CASCADE)
 
     class Meta:
-        managed = False
-        db_table = 'raw_ptt'
+        managed = True
+        db_table = 'ptt_raw_ptt'

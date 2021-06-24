@@ -9,173 +9,68 @@ import time
 import json
 
 from crawler_model import Ptt
+from util import make_phone_dict, make_iphone_matches
 
 ua = UserAgent()
 fakeua = ua.random
 
-def make_phone_dict():
-    url = "https://en.wikipedia.org/wiki/List_of_Android_smartphones"
-    resp = requests.get(url)
-    soup = BeautifulSoup(resp.text, "html.parser")
 
-    tables = soup.find_all("table", class_="wikitable")
-    rows = []
-    for i in tables:
-        rows.extend(i.select("tbody tr th"))
-
-    phones = [a.text.partition("(")[0].strip() for a in rows]
-    phones = [ p for p in phones if len(p.split()) > 1]
-
-    brands = set()
-    for p in phones:
-        brands.add(p.split(" ")[0])
-    brands = list(brands)
-    brands = sorted(brands)
-    for b in range(len(brands)):
-        if brands[b] == "Asus":
-            brands = brands[b:]
-            break
-
-    phone_dict = defaultdict(list)
-    for b in brands:
-        if b == "Samsung":
-            for p in phones:
-                if p.split(" ")[0] == b:
-                    if "/" in p:
-                        p_lst = p.split("/")
-                        for series in p_lst[1:]:
-                            sub_p = p_lst[0].replace(b + " Galaxy", "").replace("5G", "").strip()
-                            if series == "+":
-                                phone = sub_p + series
-                            else:
-                                phone = sub_p + " " + series
-                            if len(phone) > 0:
-                                phone_dict[b].append(phone)
-                        phone_dict[b].append(sub_p)
-                    else:
-                        phone = p.replace(b + " Galaxy", "").replace("5G", "").strip()
-                        if len(phone) > 0:
-                            phone_dict[b].append(phone)
-        elif b == "POCO":
-            for p in phones:
-                if p.split(" ")[0] == b:
-                    phone = p.replace("5G", "").strip()
-                    if len(phone) > 0:
-                        phone_dict["Xiaomi"].append(phone)
-        elif b == "Developer":
-            for p in phones:
-                if p.split(" ")[0] == b:
-                    if "/" in p:
-                        p_lst = p.split("/")
-                        for series in p_lst[1:]:
-                            sub_p = p_lst[0].replace(b, "").replace("5G", "").strip()
-                            if series == "+":
-                                phone = sub_p + series
-                            else:
-                                phone = sub_p + " " + series
-                            if len(phone) > 0:
-                                phone_dict[b].append(phone)
-                        phone_dict[b].append(sub_p)
-                    else:
-                        phone = p.replace(b, "").replace("5G", "").strip()
-                        if len(phone) > 0:
-                            print(phone)
-                            phone_dict[b].append(phone)
-                        phone_dict[b].append(phone)
-        else:
-            for p in phones:
-                if p.split(" ")[0] == b:
-                    if "/" in p:
-                        p_lst = p.split("/")
-                        for series in p_lst[1:]:
-                            sub_p = p_lst[0].replace(b, "").replace("5G", "").strip()
-                            if series == "+":
-                                phone = sub_p + series
-                            else:
-                                phone = sub_p + " " + series
-                            if len(phone) > 0:
-                                phone_dict[b].append(phone)
-                        phone_dict[b].append(sub_p)
-                    else:
-                        phone = p.replace(b, "").replace("5G", "").strip()
-                        if len(phone) > 0:
-                            phone_dict[b].append(phone)
-                        phone_dict[b].append(phone)
-    phone_dict["Asus"].append("ROG Phone 2")
-    while "ROG Phone II" in phone_dict["Asus"]:
-        phone_dict["Asus"].remove("ROG Phone II")
-
-    phone_dict.pop("Galaxy")
-
-    url = "https://www.theiphonewiki.com/wiki/List_of_iPhones"
-    resp = requests.get(url)
-    soup = BeautifulSoup(resp.text, "html.parser")
-
-    table = soup.find("div", id="toc")
-    iphones = []
-    for span in table.select("ul li span"):
-        if "iPhone" in str(span):
-            if ("SE" in str(span)) and ("1" in str(span)):
-                iphones.append("iPhone SE")
-            elif ("SE" in str(span)) and ("2" in str(span)):
-                iphones.append("iPhone SE2")
-            else:
-                iphones.append(span.text)
-    phone_dict["iPhone"] = iphones
-
-    for k in phone_dict.keys():
-        phone_dict[k] = sorted(phone_dict[k], key=lambda x: len(x), reverse=True)
-
-    return phone_dict
-
-def read_phone_catalog():
-    with open('phone_catalog.json', 'r') as fp:
-        phone_dict = json.load(fp)
-    return phone_dict
-
-def make_iphone_matches(phone_dict):
-    phone_brand_set = set()
-    for k in phone_dict.keys():
-        for v in phone_dict[k]:
-            for iphone in [ i.replace("iPhone", "").strip() for i in phone_dict["iPhone"] ]:
-                if v == iphone:
-                    phone_brand_set.add(v)
-    iphone_matches = sorted([v for v in list(set([ i.replace("iPhone", "").strip() for i in phone_dict["iPhone"] ]) - phone_brand_set) if len(v) > 0], key=lambda x: len(x), reverse=True)
-    iphone_matches = [ i for i in iphone_matches if ("11" in i) or ("12" in i) or ("SE2" in i)]
-    iphone_matches.remove("12")
-    iphone_matches.remove("11")
-    return iphone_matches
-
-def get_last_page(source):
-    ua = UserAgent()
-    fakeua = ua.random
+def get_ptt_last_page(source):
     headers = {"Origin": "https://www.ptt.cc",
             "Referer": "https://fonts.googleapis.com/",
             "sec-ch-ua-mobile": "?0",
-            "User-Agent": fakeua}
+            "User-Agent": "Mozilla/5.0 (Windows NT 4.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"}
     url = "https://www.ptt.cc/bbs/{}/index.html".format(source)
     resp = requests.get(url, headers=headers)
     soup = BeautifulSoup(resp.text, "html.parser")
     previous = soup.find_all("a", class_="btn wide")[1]["href"]
-    previous_page_num = int(re.findall(r"\d+", previous)[0])
-    return previous_page_num
+    ptt_last_page = int(re.findall(r"\d+", previous)[0])+1
+    return ptt_last_page
 
-def crawl_mobilesales(links, page, sold, phone_dict, raw_data, data, error_links):
-    for link in links:
-        url = "https://www.ptt.cc" + link
-        # print(url)
-        # GET request from url and parse via BeautifulSoup
-        ua = UserAgent()
-        fakeua = ua.random
+
+def get_db_last_page(source):
+    db = Ptt()
+    db_last_page = db.select_max_page_number()
+    return db_last_page
+
+
+def get_mobilesales_link(ptt_last_page, db_last_page):
+    links = []
+    for page in range(ptt_last_page, db_last_page, -1):
         headers = {"Origin": "https://www.ptt.cc",
                 "Referer": "https://fonts.googleapis.com/",
                 "sec-ch-ua-mobile": "?0",
-                "User-Agent": fakeua}
+                "User-Agent": "Mozilla/5.0 (Windows NT 4.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"}
+
+        url = "https://www.ptt.cc/bbs/mobilesales/index{}.html".format(page)
+        resp = requests.get(url, headers=headers)
+
+        index_soup = BeautifulSoup(resp.text, "html.parser")
+        title = index_soup.findAll("div", class_="title")
+        links.extend([ (page, t.find("a")["href"]) for t in title if ("賣" in str(t))])
+    return links
+
+
+def crawl_mobilesales(links, phone_dict):
+    raw_data = []
+    data = []
+    for link in links:
+        url = "https://www.ptt.cc" + link[1]
+        sold = False
+        print(url)
+        # GET request from url and parse via BeautifulSoup
+        headers = {"Origin": "https://www.ptt.cc",
+                "Referer": "https://fonts.googleapis.com/",
+                "sec-ch-ua-mobile": "?0",
+                "User-Agent": "Mozilla/5.0 (Windows NT 4.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"}
         resp = requests.get(url, headers=headers)
         if "200" in str(resp):
             try:
                 soup = BeautifulSoup(resp.text, "html.parser")
-
+                body = soup.find("body")
+                if "已售" in str(body) or "售出" in str(body):
+                    sold = True
+                    
                 # basic info: accout, board, title, created_at
                 info = [ i.text.strip() for i in soup.findAll("span", class_="article-meta-value")]
                 try:
@@ -241,7 +136,6 @@ def crawl_mobilesales(links, page, sold, phone_dict, raw_data, data, error_links
                 else:
                     for x in iphone_matches:
                         if x.lower().replace(" ", "") in title.lower().replace(" ", ""):
-                            print(x)
                             for phone in phone_dict["iPhone"]:
                                 if x == phone.lower().replace(" ", ""):
                                     for s in  ["32", "64", "128", "256", "512"]:
@@ -249,7 +143,6 @@ def crawl_mobilesales(links, page, sold, phone_dict, raw_data, data, error_links
                                             storage = int(s)
                                             break
                                     title = phone
-                                    print("iPhone:", title)
                                     break
                             break
 
@@ -264,10 +157,6 @@ def crawl_mobilesales(links, page, sold, phone_dict, raw_data, data, error_links
 
                 # status
                 try:
-                    # status = re.findall(r'物品狀況.+\n', str(soup.find("div", id="main-content")))[0].strip()
-                    # if len(status) <= 5:
-                    #     status = re.findall(r'狀況.+盒裝內含', str(soup.find("div", id="main-content")).replace("\n", ""))[0]
-
                     if ("全新" in info[2]):
                         new = True
                     elif ("近全新" in info[2]) or ("外觀全新" in info[2]) or ("全新耳機" in info[2]) or ("全新配件" in info[2]):
@@ -305,11 +194,13 @@ def crawl_mobilesales(links, page, sold, phone_dict, raw_data, data, error_links
                         box = box.replace(" ", "")[:-2]
                 except IndexError:
                     box = None
-
-                data.append([title, storage, price, new, sold, account, box, url, created_at, page, "mobilesales"])
-                raw_data.append([url, str(soup.find("body"))])
+                if price:
+                    data.append([title, storage, price, new, sold, account, box, url, created_at, link[0], "mobilesales"])
+                    raw_data.append([url, str(soup.find("body"))]) 
             except:
-                error_links.append(url)
+                raw_data.append([url, str(soup.find("body"))])
+    return raw_data, data 
+
 
 def crawl_macshop(links, page, sold, iphones, raw_data, data, error_links):
     for link in links:
@@ -417,52 +308,13 @@ def crawl_macshop(links, page, sold, iphones, raw_data, data, error_links):
                 error_links.append(url)
                 raw_data.append([url, str(soup.find("body"))])
 
-def main_mobilesales(last_page, max_page, phone_dict):
+
+def main_macshop(ptt_last_page, db_last_page, phone_dict):
     raw_data = []
     data = []
     error_links = []
     init = time.time()
-    for page in range(last_page, max_page, -1):
-        start = time.time()
-        ua = UserAgent()
-        fakeua = ua.random
-        headers = {"Origin": "https://www.ptt.cc",
-                "Referer": "https://fonts.googleapis.com/",
-                "sec-ch-ua-mobile": "?0",
-                "User-Agent": fakeua}
-
-        url = "https://www.ptt.cc/bbs/mobilesales/index{}.html".format(page)
-        print(url)
-        # GET request from url and parse via BeautifulSoup
-        resp = requests.get(url, headers=headers)
-        #resp.encoding = 'utf-8' # encoded with format utf-8 for chinese character
-        index_soup = BeautifulSoup(resp.text, "html.parser")
-        title = index_soup.findAll("div", class_="title")
-        links = [ t.find("a")["href"] for t in title if ("賣" in str(t)) and ("已售" not in str(t)) and ("售出" not in str(t))]
-        sold_links = [ t.find("a")["href"] for t in title if ("已售" in str(t)) or ("售出" in str(t))]
-
-        crawl_mobilesales(links, page, False, phone_dict, raw_data, data, error_links)
-        crawl_mobilesales(sold_links, page, True, phone_dict, raw_data, data, error_links)
-        print(time.time()-start, time.time()-init)
-        if page%100 == 0:
-            db = Ptt()
-            db.insert_post(raw_data, data)
-            print("Insert {} Success.".format(page))
-            raw_data = []
-            data = []
-    db = Ptt()
-    db.insert_post(raw_data, data)
-    raw_data = []
-    data = []
-    print(len(error_links))
-    print(error_links)
-
-def main_macshop(last_page, max_page, phone_dict):
-    raw_data = []
-    data = []
-    error_links = []
-    init = time.time()
-    for page in range(last_page, max_page, -1):
+    for page in range(ptt_last_page, db_last_page, -1):
         start = time.time()
         ua = UserAgent()
         fakeua = ua.random
@@ -496,6 +348,7 @@ def main_macshop(last_page, max_page, phone_dict):
     data = []
     print(len(error_links))
     print(error_links)
+
 
 def update_ptt_unsold(links):
     data = []
@@ -558,22 +411,21 @@ def update_ptt_unsold(links):
     print("Insert {} Success.".format(i))
     data = []    
 
-if __name__ == '__main__':
-    # phone_dict = make_phone_dict()
-    # iphone_matches = make_iphone_matches(phone_dict)
-    # last_page = get_last_page("mobilesales")
-    # max_page = Ptt().select_max_page_number("mobilesales") or 20300
-    # main_mobilesales(last_page, max_page, phone_dict)
 
-    # last_page = get_last_page("MacShop")
-    # max_page = Ptt().select_max_page_number("MacShop") or 18900
-    # main_macshop(last_page, max_page, phone_dict["iPhone"])
+if __name__ == '__main__':
+    phone_dict = make_phone_dict()
+    iphone_matches = make_iphone_matches(phone_dict)
+    ptt_last_page = get_ptt_last_page("mobilesales")
+    db_last_page = get_db_last_page("mobilesales")
+    links = get_mobilesales_link(ptt_last_page, db_last_page)
+    raw_data, data = crawl_mobilesales
+    db = Ptt()
+    db.insert_post(raw_data, data)
+    
+    ptt_last_page = get_ptt_last_page("MacShop")
+    db_last_page = get_db_last_page("MacShop")
+    max_page = Ptt().select_max_page_number("MacShop")
+    main_macshop(db_last_page, ptt_last_page, phone_dict["iPhone"])
+
     links = Ptt().select_unsold_links()
     update_ptt_unsold(links)
-
-# airflow users create \
-#     --username admin \
-#     --firstname addie \
-#     --lastname chung \
-#     --role Admin \
-#     --email addiechung.tyc@gmail.com

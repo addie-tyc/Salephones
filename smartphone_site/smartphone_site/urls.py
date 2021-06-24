@@ -34,7 +34,7 @@ urlpatterns = [
     path('logout', views.LogoutView.as_view(), name="logout"),
     path('sale', views.SaleView.as_view(), name="sale"),
     path('post/<int:id>', views.PostView.as_view()),
-    path('api/v1/home', views.PttHomeView.as_view()),
+    path('api/v1/home', views.PttHomeView.as_view(), name="home_api"),
     path('api/v1/table', views.PttTableView.as_view()),
     path('api/v1/price-graph', views.PttPriceGraphView.as_view()),
     path('api/v1/storage-graph', views.PttStorageGraphView.as_view()),

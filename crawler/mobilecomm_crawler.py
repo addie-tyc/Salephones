@@ -15,6 +15,8 @@ import json
 import pprint
 import os
 
+from util import get_phones
+
 load_dotenv()
 user = os.getenv("MONGO_USER")
 psw = os.getenv("MONGO_PSW")
@@ -28,108 +30,6 @@ client = MongoClient(uri)
 db = client["mobileComm"]
 db_coll = db["sentiment"]
 
-def get_phones():
-    url = "https://en.wikipedia.org/wiki/List_of_Android_smartphones"
-    resp = requests.get(url)
-    soup = BeautifulSoup(resp.text, "html.parser")
-
-    tables = soup.find_all("table", class_="wikitable")
-    rows = []
-    for i in tables:
-        rows.extend(i.select("tbody tr th"))
-
-    phones = [a.text.partition("(")[0].strip() for a in rows]
-    phones = [ p for p in phones if len(p.split()) > 1]
-
-    brands = set()
-    for p in phones:
-        brands.add(p.split(" ")[0])
-    brands = list(brands)
-    brands = sorted(brands)
-    for b in range(len(brands)):
-        if brands[b] == "Asus":
-            brands = brands[b:]
-            break
-
-    phone_list = []
-    for b in brands:
-        if b == "Samsung":
-            for p in phones:
-                if p.split(" ")[0] == b:
-                    if "/" in p:
-                        p_lst = p.split("/")
-                        for series in p_lst[1:]:
-                            sub_p = p_lst[0].replace("5G", "").strip()
-                            if series == "+":
-                                phone = sub_p + series
-                            else:
-                                phone = sub_p + " " + series
-                            if len(phone) > 0:
-                                phone_list.append(phone)
-                        phone_list.append(sub_p)
-                    else:
-                        phone = p.replace("5G", "").strip()
-                        if len(phone) > 0:
-                            phone_list.append(phone)
-        elif b == "POCO":
-            for p in phones:
-                if p.split(" ")[0] == b:
-                    phone = p.replace("5G", "").strip()
-                    if len(phone) > 0:
-                        phone_list.append(phone)
-
-        elif b == "Pixel":
-            for p in phones:
-                if p.split(" ")[0] == b:
-                    phone = p.replace("5G", "").strip()
-                    if len(phone) > 0:
-                        phone_list.append(phone)
-        else:
-            for p in phones:
-                if p.split(" ")[0] == b:
-                    if "/" in p:
-                        p_lst = p.split("/")
-                        for series in p_lst[1:]:
-                            sub_p = p_lst[0].replace("5G", "").strip()
-                            if series == "+":
-                                phone = sub_p + series
-                            else:
-                                phone = sub_p + " " + series
-                            if len(phone) > 0:
-                                phone_list.append(phone)
-                        phone_list.append(sub_p)
-                    else:
-                        phone = p.replace("5G", "").strip()
-                        if len(phone) > 0:
-                            phone_list.append(phone)
-                        phone_list.append(phone)
-    phone_list.append("Asus ROG Phone 2")
-    extend = ["Note 20 Ultra", "S20 Ultra", "S21 Ultra", "S20+", "S21+", "S20", "S21"]
-    for s in extend:
-        phone_list.append(s)
-
-    url = "https://www.theiphonewiki.com/wiki/List_of_iPhones"
-    resp = requests.get(url)
-    soup = BeautifulSoup(resp.text, "html.parser")
-
-    table = soup.find("div", id="toc")
-    iphones = []
-    for span in table.select("ul li span"):
-        if "iPhone" in str(span):
-            if ("SE" in str(span)) and ("1" in str(span)):
-                iphones.append("iPhone SE")
-            elif ("SE" in str(span)) and ("2" in str(span)):
-                iphones.append("iPhone SE2")
-            else:
-                iphones.append(span.text)
-    iphones.remove("iPhone")
-    phone_list.extend(iphones)
-    phone_set = set()
-    for p in phone_list:
-        phone_set.add(p)
-    phone_list = sorted(list(phone_set), key=lambda x: len(x), reverse=True)
-    phone_list.remove("Asus ROG Phone II")
-    return phone_list
 
 def sample_analyze_sentiment(text_content):
     """
@@ -165,6 +65,7 @@ def sample_analyze_sentiment(text_content):
     
     return doc, sentences
 
+
 def crawl_comm(links):
     data = []
     for link in links:
@@ -197,9 +98,10 @@ def crawl_comm(links):
         data.append(d)
     return data
 
+
 def crawl_comm_pages():
     
-    for page in range(77, 100):
+    for page in range(0, 100):
 
         ua = UserAgent()
         fakeua = ua.random
@@ -233,6 +135,7 @@ def crawl_comm_pages():
         data = crawl_comm(links)
         if len(data) > 0:
             db_coll.insert_many(data, ordered=False)
+
 
 def crawl_mobile01(year=2021):
     url = f"https://www.mobile01.com/newslist.php?type=1&c=16&date={year}"
@@ -280,5 +183,5 @@ def crawl_mobile01(year=2021):
         db_coll.insert_many(data, ordered=False)
         
 if __name__ == '__main__':
-    # crawl_comm_pages()
-    crawl_mobile01(year=2020)
+    crawl_comm_pages()
+    crawl_mobile01(year=2021)

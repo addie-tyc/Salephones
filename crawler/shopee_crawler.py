@@ -10,7 +10,11 @@ from collections import defaultdict
 import os
 
 from crawler_model import Ptt
+from util import make_phone_dict, make_iphone_matches
 
+
+PRICE_FLOOR = 999
+PRICE_SCALAR = 100000 # modifying shopee price
 def gen_header_search(keyword):
     ua = UserAgent()
     fakeua = ua.random
@@ -20,6 +24,7 @@ def gen_header_search(keyword):
     'referer': f'https://shopee.tw/search?keyword={urllib.parse.quote(keyword)}'
     }
     return headers
+
 
 def gen_header(referer):
     ua = UserAgent()
@@ -31,108 +36,6 @@ def gen_header(referer):
     }
     return headers
 
-def make_phone_dict():
-    url = "https://en.wikipedia.org/wiki/List_of_Android_smartphones"
-    resp = requests.get(url)
-    soup = BeautifulSoup(resp.text, "html.parser")
-
-    tables = soup.find_all("table", class_="wikitable")
-    rows = []
-    for i in tables:
-        rows.extend(i.select("tbody tr th"))
-
-    phones = [a.text.partition("(")[0].strip() for a in rows]
-    phones = [ p for p in phones if len(p.split()) > 1]
-
-    brands = set()
-    for p in phones:
-        brands.add(p.split(" ")[0])
-    brands = list(brands)
-    brands = sorted(brands)
-    for b in range(len(brands)):
-        if brands[b] == "Asus":
-            brands = brands[b:]
-            break
-
-    phone_dict = defaultdict(list)
-    for b in brands:
-        if b == "Samsung":
-            for p in phones:
-                if p.split(" ")[0] == b:
-                    if "/" in p:
-                        p_lst = p.split("/")
-                        for series in p_lst[1:]:
-                            sub_p = p_lst[0].replace(b + " Galaxy", "").replace("5G", "").strip()
-                            if series == "+":
-                                phone = sub_p + series
-                            else:
-                                phone = sub_p + " " + series
-                            if len(phone) > 0:
-                                phone_dict[b].append(phone)
-                        phone_dict[b].append(sub_p)
-                    else:
-                        phone = p.replace(b + " Galaxy", "").replace("5G", "").strip()
-                        if len(phone) > 0:
-                            phone_dict[b].append(phone)
-        elif b == "POCO":
-            for p in phones:
-                if p.split(" ")[0] == b:
-                    phone = p.replace("5G", "").strip()
-                    if len(phone) > 0:
-                        phone_dict["Xiaomi"].append(phone)
-
-        elif b == "Pixel":
-            for p in phones:
-                if p.split(" ")[0] == b:
-                    phone = p.replace("5G", "").strip()
-                    if len(phone) > 0:
-                        phone_dict[b].append(phone)
-        else:
-            for p in phones:
-                if p.split(" ")[0] == b:
-                    if "/" in p:
-                        p_lst = p.split("/")
-                        for series in p_lst[1:]:
-                            sub_p = p_lst[0].replace(b, "").replace("5G", "").strip()
-                            if series == "+":
-                                phone = sub_p + series
-                            else:
-                                phone = sub_p + " " + series
-                            if len(phone) > 0:
-                                phone_dict[b].append(phone)
-                        phone_dict[b].append(sub_p)
-                    else:
-                        phone = p.replace(b, "").replace("5G", "").strip()
-                        if len(phone) > 0:
-                            phone_dict[b].append(phone)
-                        phone_dict[b].append(phone)
-    phone_dict["Asus"].append("ROG Phone 2")
-    phone_dict["Asus"].remove("ROG Phone II")
-    phone_dict.pop("Galaxy")
-    phone_dict.pop("Release")
-
-    url = "https://www.theiphonewiki.com/wiki/List_of_iPhones"
-    resp = requests.get(url)
-    soup = BeautifulSoup(resp.text, "html.parser")
-
-    table = soup.find("div", id="toc")
-    iphones = []
-    for span in table.select("ul li span"):
-        if "iPhone" in str(span):
-            if ("SE" in str(span)) and ("1" in str(span)):
-                iphones.append("iPhone SE")
-            elif ("SE" in str(span)) and ("2" in str(span)):
-                iphones.append("iPhone SE2")
-            else:
-                iphones.append(span.text)
-    iphones = sorted(iphones, reverse=True)
-    phone_dict["iPhone"] = iphones
-    phone_dict["Samsung"].append("A71")
-
-    for k in phone_dict.keys():
-        phone_dict[k] = sorted(phone_dict[k], key=lambda x: len(x), reverse=True)
-
-    return phone_dict
 
 proxy_lst = ['http://tihyjcyk-dest:sr9mbjac4xab@193.8.231.209:9215',
  'http://tihyjcyk-dest:sr9mbjac4xab@107.152.177.67:6087',
@@ -234,23 +137,10 @@ proxy_lst = ['http://tihyjcyk-dest:sr9mbjac4xab@193.8.231.209:9215',
  'http://tihyjcyk-dest:sr9mbjac4xab@2.56.101.122:8654',
  'http://tihyjcyk-dest:sr9mbjac4xab@85.209.130.132:7673',
  'http://tihyjcyk-dest:sr9mbjac4xab@193.8.231.21:9027']
-# proxy_lst = []
-# with open(os.getcwd()+"/crawler/free_proxy.csv") as file:
-#     for row in file:
-#         proxy_lst.append("http://" + row.strip())
+
 
 phone_dict = make_phone_dict()
-phone_brand_set = set()
-for k in phone_dict.keys():
-    for v in phone_dict[k]:
-        for iphone in [ i.replace("iPhone", "").strip() for i in phone_dict["iPhone"] ]:
-            if v == iphone:
-                phone_brand_set.add(v)
-iphone_matches = sorted([v for v in list(set([ i.replace("iPhone", "").strip() for i in phone_dict["iPhone"] ]) - phone_brand_set) if len(v) > 0], key=lambda x: len(x), reverse=True)
-iphone_matches = [ i for i in iphone_matches if ("11" in i) or ("12" in i) or ("SE2" in i)]
-iphone_matches.remove("12")
-iphone_matches.remove("11")
-
+iphone_matches = make_iphone_matches()
 def get_title_storage(phone_dict=phone_dict, iphone_matches=iphone_matches, title=""):
     if ("紅米" in title.lower()) or ("redmi" in title.lower()):
         title = "Redmi" + " " + title
@@ -310,13 +200,13 @@ def get_title_storage(phone_dict=phone_dict, iphone_matches=iphone_matches, titl
                 break
     return title, storage
 
+
 def crawl_shopee(proxy_lst=proxy_lst, end=5000, step=50):
     data = []
     keyword = "二手手機"
-    init = time.time()
     random.shuffle(proxy_lst)
-    proxy_chosen = proxy_lst[:int(end/step)]
-    i = 1050
+    proxy_chosen = proxy_lst[:int(end / step)]
+    i = 0
     headers = gen_header_search(keyword)
     s = requests.Session()
     s.keep_alive = False
@@ -341,18 +231,17 @@ def crawl_shopee(proxy_lst=proxy_lst, end=5000, step=50):
 
         url = base_url + '?' + query
         r = s.get(url, headers=headers, proxies=proxies)
-        print(time.time()-init)
         if r.status_code == requests.codes.ok:
             res_json = r.json()
             items = sorted(res_json["items"], key=lambda d: d["ctime"])
             if items[-1]["ctime"] > datetime.timestamp(datetime.now()):
-                proxy_chosen.pop(int(i/step))
-                proxy_chosen.append(proxy_chosen[int(i/step)-1])
+                proxy_chosen.pop(int(i / step))
+                proxy_chosen.append(proxy_chosen[int(i / step)-1])
                 print("Take a rest!")
                 time.sleep(30)
             else:   
                 for d in items:
-                    if int(d["price"]/100000) > 2000:
+                    if int(d["price"] / PRICE_SCALAR) > PRICE_FLOOR:
                         start = time.time()
                         rf = f'https://shopee.tw/product/{d["shopid"]}/{d["itemid"]}'
                         headers = gen_header(rf)
@@ -364,7 +253,7 @@ def crawl_shopee(proxy_lst=proxy_lst, end=5000, step=50):
                                 (
                                 title,
                                 storage,
-                                (int(d["price"]/100000)), # price
+                                (int(d["price"] / PRICE_SCALAR)), # price
                                 False, # new
                                 (item["status"] == "sold_out"), # sold
                                 item["description"].replace("\n", "。"), # box
@@ -373,7 +262,6 @@ def crawl_shopee(proxy_lst=proxy_lst, end=5000, step=50):
                                 "shopee" # source
                                 ) 
                             )
-                        print(time.time()-start)
                 if i%500 == 0:
                     db = Ptt()
                     db.insert_shopee(data)
@@ -383,7 +271,7 @@ def crawl_shopee(proxy_lst=proxy_lst, end=5000, step=50):
                 print(i, len(data))
         else:
             i += step
-    print(time.time()-init)
+
 
 if __name__ == "__main__":
     crawl_shopee()
