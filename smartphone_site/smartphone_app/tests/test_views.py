@@ -7,7 +7,8 @@ import json
 
 class HomeViewTest(TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUp(cls):
         #Create phones
         number_of_phones = 10
         for phone_num in range(number_of_phones):
@@ -21,8 +22,6 @@ class HomeViewTest(TestCase):
         resp = self.client.get(reverse('home_api'))
         self.assertEqual(resp.status_code, 200)
         
-    def test_data_len_is_ten(self):
-        resp = self.client.get(reverse('home_api'))
-        len_data = len(json.loads(str(resp.content))["products"])
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(len_data, 10)
+    def test_datail_page_template(self):
+        resp = self.client.get('/detail/iPhone+12/128')
+        self.assertTemplateUsed(resp, "detail.html")
