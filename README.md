@@ -15,10 +15,6 @@ monitor system with Prometheus and Grafana, and ran on GCP VM.
 
 Website URL: https://salephones.site/home
 
-<img style="float: left; width: 49%; margin-right: 2%" src="https://aws-bucket-addie.s3.ap-northeast-1.amazonaws.com/smartphone/home.png">
-
-<img style="float: right; width: 49%;" src="https://aws-bucket-addie.s3.ap-northeast-1.amazonaws.com/smartphone/detail.png">
-
 ## Table of Contents
 * [Technologies](#Technologies)
 * [Architecture](#Architecture)
@@ -75,14 +71,26 @@ Website URL: https://salephones.site/home
 ![Database Schema](https://aws-bucket-addie.s3.ap-northeast-1.amazonaws.com/smartphone/schema.png)
 
 ## Features
-* Home page: all cellphones of different brands
+* Home page: all cellphones of different brands  
+
+![home](https://aws-bucket-addie.s3.ap-northeast-1.amazonaws.com/smartphone/home.png)
+
 * Detail page:
   - Price table: show each of sale message
   - Price graph
     - Price history: show the specific phone price history with a new one price and average price with 30 days
     - Different storage price history: show the specific phone price history between different storage
   - Sentiment Score: caculate sentiment score by GCP NL API
-  - Comments: use GCP NL API to classify good or bad reviews
+  - Comments: use GCP NL API to classify good or bad reviews  
+
+![detail](https://aws-bucket-addie.s3.ap-northeast-1.amazonaws.com/smartphone/detail.png)
+
+* Post a sale / profile page (login required):
+  - You can filled form to upload your own sale message
+  - Check profile detail and past sale messages  
+
+![sale](https://aws-bucket-addie.s3.ap-northeast-1.amazonaws.com/smartphone/sale.png)
+![profile](https://aws-bucket-addie.s3.ap-northeast-1.amazonaws.com/smartphone/profile.png)
 
 
 ## Demo Account
