@@ -31,7 +31,7 @@ SECRET_KEY = env.SECRET_KEY
 DEBUG = False
 
 
-ALLOWED_HOSTS = ["salephones.site", "127.0.0.1"]
+ALLOWED_HOSTS = ["salephones.site", "127.0.0.1", "localhost"]
 
 
 # Application definition
@@ -169,4 +169,16 @@ LOGIN_REDIRECT_URL = 'smartphone-smartprice/home'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # media directory in the root directory
 MEDIA_URL = '/media/'
+
+SESSIONS_ENGINE='django.contrib.sessions.backends.cache'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'djpymemcache.backend.PyMemcacheCache',
+        'LOCATION': [
+           '127.0.0.1:11211',
+        ],
+    }
+}
+
 

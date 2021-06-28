@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'landtop',
-                'managed': True,
+                'managed': False,
             },
         ),
         migrations.CreateModel(
@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'ptt',
-                'managed': True,
+                'managed': False,
             },
         ),
         migrations.CreateModel(
@@ -58,7 +58,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'raw_ptt',
-                'managed': True,
+                'managed': False,
             },
         ),
         migrations.CreateModel(
@@ -70,7 +70,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'ptt_raw_ptt',
-                'managed': True,
+                'managed': False,
             },
         ),
         migrations.CreateModel(
@@ -82,7 +82,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'ptt_landtop',
-                'managed': True,
+                'managed': False,
             },
         ),
         migrations.AddField(

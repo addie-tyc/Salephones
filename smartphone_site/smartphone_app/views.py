@@ -9,6 +9,9 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from ratelimit.decorators import ratelimit
 from rest_framework import serializers
 from django.conf import settings
 import boto3
@@ -36,6 +39,7 @@ SENTIMENT_SCALAR = 20
 
 # pages
 
+@ratelimit(key='ip', rate='2/m')
 def home_page(request):
     return render(request, 'home.html')
 
@@ -155,6 +159,7 @@ class PttHomeView(GenericAPIView):
     queryset = Ptt.objects.all().prefetch_related("landtop")
     serializer_class = PttSerializer
 
+    @method_decorator(cache_page(60 * 15))
     def get(self, request, *args, **krgs):
         phones = get_phones()
         fetch = (self.get_queryset()
