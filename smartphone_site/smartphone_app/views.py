@@ -39,7 +39,7 @@ SENTIMENT_SCALAR = 20
 
 # pages
 
-@ratelimit(key='ip', rate='2/m')
+@ratelimit(key='ip', rate='10/s')
 def home_page(request):
     return render(request, 'home.html')
 
