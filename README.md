@@ -16,12 +16,13 @@ monitor system with Prometheus and Grafana, and ran on GCP VM.
 Website URL: https://salephones.site/home
 
 ## Table of Contents
-* [Technologies](#Technologies)
-* [Architecture](#Architecture)
-* [Database Schema](#Database-Schema)
-* [Features](#Features)
-* [Demo Account](#Demo-Account)
-* [Contact](#Contact)
+  - [Technologies](#technologies)
+  - [Architecture](#architecture)
+  - [Data Pipeline](#data-pipeline)
+  - [Database Schema](#database-schema)
+  - [Features](#features)
+  - [Demo Account](#demo-account)
+  - [Contact](#contact)
 
 ## Technologies
 
@@ -66,6 +67,12 @@ Website URL: https://salephones.site/home
 
 ## Architecture
 ![Architecture](https://aws-bucket-addie.s3.ap-northeast-1.amazonaws.com/smartphone/architecture.png)
+
+## Data Pipeline
+![Data Pipeline](https://aws-bucket-addie.s3.ap-northeast-1.amazonaws.com/smartphone/pipeline.png)
+### Monitor
+Used Statsd to generate log records, Made Prometheus scrap records and show metrics on grafana.
+![Monitor](https://aws-bucket-addie.s3.ap-northeast-1.amazonaws.com/smartphone/grafana.png)
 
 ## Database Schema
 ![Database Schema](https://aws-bucket-addie.s3.ap-northeast-1.amazonaws.com/smartphone/schema.png)
