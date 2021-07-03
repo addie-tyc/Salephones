@@ -3,7 +3,7 @@ from django.http import HttpResponse, JsonResponse, QueryDict
 from rest_framework.views import APIView
 from rest_framework.generics import GenericAPIView
 from bs4 import BeautifulSoup
-from django.db.models import Count, FloatField, IntegerField, DateField, Avg, Max, Func, F, Min
+from django.db.models import Count, FloatField, IntegerField, DateField, Avg, Max, Func, F, Min, Q
 from django.db.models.functions import Cast
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
@@ -13,7 +13,6 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from ratelimit.decorators import ratelimit
 from rest_framework import serializers
-from rest_framework.response import Response
 from django.conf import settings
 import boto3
 
@@ -175,6 +174,7 @@ class PttHomeView(GenericAPIView):
                 new=IS_NOT_NEW, 
                 title__in=phones, 
                 created_at__gte=datetime.now()-timedelta(days=PRICE_DAYS_PERIOD))
+        .filter(Q(landtop__created_at__gte=datetime.now()-timedelta(days=1))|Q(landtop__price__isnull=True))
         .exclude(storage__isnull=True)
         .exclude(price__isnull=True)
         .order_by('title'))
@@ -217,7 +217,8 @@ class PttTableView(GenericAPIView):
         serializer = self.serializer_class(fetch, many=True)
         phone_table = serializer.data
         
-        return Response({"phone": phone, "title":title, "storage": storage, "phone_table": phone_table}) 
+        return JsonResponse({"phone": phone, "title":title, "storage": storage, "phone_table": phone_table}, 
+                            json_dumps_params={'ensure_ascii':False})
 
 
 class PttPriceGraphView(GenericAPIView):
@@ -245,8 +246,6 @@ class PttPriceGraphView(GenericAPIView):
                 storage=storage, 
                 price__gte=PRICE_FLOOR, 
                 price__lt=PRICE_CEIL)
-        .exclude(storage__isnull=True)
-        .exclude(price__isnull=True)
         .order_by('date'))
 
         serializer = PttGraphSerializer(fetch, many=True)
@@ -259,9 +258,7 @@ class PttPriceGraphView(GenericAPIView):
                 storage=storage, 
                 price__gte=PRICE_FLOOR, 
                 date__gte=datetime.now().date()-timedelta(days=PRICE_DAYS_PERIOD), 
-                price__lt=PRICE_CEIL)
-        .exclude(storage__isnull=True)
-        .exclude(price__isnull=True))
+                price__lt=PRICE_CEIL))
 
         if len(fetch) > 0:
             avg_price_30 = fetch[0].avg_price_30
@@ -279,7 +276,8 @@ class PttPriceGraphView(GenericAPIView):
             phone_graph_dict["avg_price_30"].append(avg_price_30)
         
  
-        return Response({"phone": phone, "title":title, "storage": storage, "phone_graph": phone_graph_dict})
+        return JsonResponse({"phone": phone, "title":title, "storage": storage, "phone_graph": phone_graph_dict}, 
+                             json_dumps_params={'ensure_ascii':False})
 
 
 class PttStorageGraphView(GenericAPIView):
@@ -305,8 +303,6 @@ class PttStorageGraphView(GenericAPIView):
                   max_price=Max('price'), 
                   id=Max('id', output_field=IntegerField()))
         .filter(title=title, price__gte=PRICE_FLOOR, price__lt=PRICE_CEIL)
-        .exclude(storage__isnull=True)
-        .exclude(price__isnull=True)
         .order_by('storage', 'date'))
 
         serializer = PttGraphSerializer(fetch, many=True)
@@ -322,7 +318,8 @@ class PttStorageGraphView(GenericAPIView):
             storage_graph_dict[ storage_graph[i]["storage"] ]["max_price"].append(storage_graph[i]["max_price"])
             storage_graph_dict[ storage_graph[i]["storage"] ]["new_price"].append(storage_graph[i]["new_price"])
             
-        return Response({"phone": phone, "title":title, "storage": storage, "storage_graph": storage_graph_dict})
+        return JsonResponse({"phone": phone, "title":title, "storage": storage, "storage_graph": storage_graph_dict}, 
+                             json_dumps_params={'ensure_ascii':False})
 
 
 class SaleView(GenericAPIView):

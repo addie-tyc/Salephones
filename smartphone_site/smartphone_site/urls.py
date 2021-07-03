@@ -27,6 +27,7 @@ ssl_path = env.SSL_PATH
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('/', views.home_page, name="index"),
     path('home', views.home_page, name="home"),
     path('detail/<str:title>/<int:storage>', views.detail_page),
     path('profile', views.ProfilePageView.as_view(), name="profile"),
