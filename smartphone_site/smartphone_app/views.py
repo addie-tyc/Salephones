@@ -13,6 +13,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from ratelimit.decorators import ratelimit
 from rest_framework import serializers
+from rest_framework.response import Response
 from django.conf import settings
 import boto3
 
@@ -161,6 +162,7 @@ class PttHomeView(GenericAPIView):
 
     @method_decorator(cache_page(60 * 15))
     def get(self, request, *args, **krgs):
+
         phones = get_phones()
         fetch = (self.get_queryset()
         .values('title', 
@@ -192,7 +194,7 @@ class PttHomeView(GenericAPIView):
 
 class PttTableView(GenericAPIView):
 
-    queryset = Ptt.objects.all().prefetch_related("landtop")
+    queryset = Ptt.objects.all()
     serializer_class = PttDetailSerializer
 
     def get(self, request, *args, **krgs):
@@ -210,15 +212,12 @@ class PttTableView(GenericAPIView):
                 sold=IS_NOT_SOLD, 
                 price__gte=PRICE_FLOOR, 
                 price__lt=PRICE_CEIL)
-        .exclude(storage__isnull=True)
-        .exclude(price__isnull=True)
         .order_by('-created_at'))
 
         serializer = self.serializer_class(fetch, many=True)
         phone_table = serializer.data
-            
-        return JsonResponse({"phone": phone, "title":title, "storage": storage, "phone_table": phone_table}, 
-                             json_dumps_params={'ensure_ascii':False})
+        
+        return Response({"phone": phone, "title":title, "storage": storage, "phone_table": phone_table}) 
 
 
 class PttPriceGraphView(GenericAPIView):
@@ -280,13 +279,12 @@ class PttPriceGraphView(GenericAPIView):
             phone_graph_dict["avg_price_30"].append(avg_price_30)
         
  
-        return JsonResponse({"phone": phone, "title":title, "storage": storage, "phone_graph": phone_graph_dict}, 
-                             json_dumps_params={'ensure_ascii':False})
+        return Response({"phone": phone, "title":title, "storage": storage, "phone_graph": phone_graph_dict})
 
 
 class PttStorageGraphView(GenericAPIView):
 
-    queryset = Ptt.objects.all().prefetch_related("landtop")
+    queryset = Ptt.objects.all()
     serializer_class = PttDetailSerializer
 
     def get(self, request, *args, **krgs):
@@ -324,8 +322,7 @@ class PttStorageGraphView(GenericAPIView):
             storage_graph_dict[ storage_graph[i]["storage"] ]["max_price"].append(storage_graph[i]["max_price"])
             storage_graph_dict[ storage_graph[i]["storage"] ]["new_price"].append(storage_graph[i]["new_price"])
             
-        return JsonResponse({"phone": phone, "title":title, "storage": storage, "storage_graph": storage_graph_dict}, 
-                             json_dumps_params={'ensure_ascii':False})
+        return Response({"phone": phone, "title":title, "storage": storage, "storage_graph": storage_graph_dict})
 
 
 class SaleView(GenericAPIView):

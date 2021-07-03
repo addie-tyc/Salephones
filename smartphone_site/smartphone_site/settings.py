@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'smartphone_app'
+    'smartphone_app',
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
@@ -58,6 +59,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+if DEBUG:
+    MIDDLEWARE.insert(0,  'debug_toolbar.middleware.DebugToolbarMiddleware')
+
+INTERNAL_IPS = ('127.0.0.1',)
 
 ROOT_URLCONF = 'smartphone_site.urls'
 

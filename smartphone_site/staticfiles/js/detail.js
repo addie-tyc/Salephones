@@ -1,5 +1,5 @@
 function render_products(data) {
-    
+
     let productsDiv = document.querySelector('tbody')
 
     let products = data.phone_table
@@ -12,13 +12,6 @@ function render_products(data) {
             d.link = `/post/${d.id}` 
         }
         newPost.setAttribute('onclick', `window.open('${d.link}')`);
-        // newPost.innerHTML = `
-        //                         <td name="price" class="col text-center">${d.price}</td>
-        //                         <td name="box" class="col-5">${d.box}</td>
-        //                         <td name="source" class="col text-center">${d.source}</td>
-        //                         <td name="created_at" class="col text-center">${d.created_at.replace('T', ' ').replace('Z', '')}</td>
-        //                      `
-        // productsDiv.appendChild(newPost)
         newPost.innerHTML = `
                                 <td name="price" class="col text-center">${d.price}</td>
                                 <td name="box" class="col-5">${d.box}</td>
@@ -99,7 +92,6 @@ function draw_storage_graph (data) {
     var phone = data.phone
     var graph = data.storage_graph
     let storages = Object.keys(graph)
-    console.log(storages)
     var data = [] // storages.length
     for (var i = 0; i < storages.length; i += 1) {
 

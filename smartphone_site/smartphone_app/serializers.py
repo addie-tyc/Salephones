@@ -23,6 +23,7 @@ class PttDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ptt
         fields = ('id', 'title', 'storage', 'price', 'link', 'box', 'source', 'created_at')
+        read_only_fields = ('id', 'title', 'storage', 'price', 'link', 'box', 'source', 'created_at')
 
 class PttGraphSerializer(serializers.ModelSerializer):
 

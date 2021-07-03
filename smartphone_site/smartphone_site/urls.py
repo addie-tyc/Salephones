@@ -18,6 +18,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from django.conf import settings
 from django.conf.urls.static import static
+import debug_toolbar
 
 from smartphone_app import views
 import env
@@ -41,4 +42,5 @@ urlpatterns = [
     path('api/v1/comments', views.CommentsView.as_view()),
     path('api/v1/profile', views.ProfileView.as_view()),
     path(ssl_path, views.get_ssl_file),
+    path('__debug__/', include(debug_toolbar.urls)),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
