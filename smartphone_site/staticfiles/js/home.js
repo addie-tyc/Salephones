@@ -100,7 +100,6 @@ fetch("/api/v1/home",{
     return response.json()
 })
 .then(data => {
-    console.log(data)
     render_products(data)
     }
 )
