@@ -17,7 +17,6 @@ def make_phone_dict():
 
     phones = [a.text.partition("(")[0].strip() for a in rows]
     phones = [ phone for phone in phones if len(phone.split()) > 1]
-
     brands = set()
     for phone in phones:
         brands.add(phone.split(" ")[0])
@@ -33,7 +32,7 @@ def make_phone_dict():
         if brand == "Samsung":
             for phone in phones:
                 if phone.split(" ")[0] == brand:
-                    if "/" in phone_dict:
+                    if "/" in phone:
                         p_lst = phone.split("/")
                         for series in p_lst[1:]:
                             sub_p = p_lst[0].replace(brand + " Galaxy", "").replace("5G", "").strip()
@@ -118,7 +117,7 @@ def get_phones():
         rows.extend(i.select("tbody tr th"))
 
     phones = [a.text.partition("(")[0].strip() for a in rows]
-    phones = [ p for p in phones if len(phone.split()) > 1]
+    phones = [ phone for phone in phones if len(phone.split()) > 1]
 
     brands = set()
     for phone in phones:

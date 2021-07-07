@@ -33,7 +33,7 @@ def make_phone_dict():
         if brand == "Samsung":
             for phone in phones:
                 if phone.split(" ")[0] == brand:
-                    if "/" in phone_dict:
+                    if "/" in phone:
                         p_lst = phone.split("/")
                         for series in p_lst[1:]:
                             sub_p = p_lst[0].replace(brand + " Galaxy", "").replace("5G", "").strip()
