@@ -66,21 +66,18 @@ Website URL: https://salephones.site/home
 * [Shopee](https://shopee.tw/search?keyword=%E4%BA%8C%E6%89%8B%E6%89%8B%E6%A9%9F)
 
 ## Architecture
-![Architecture](https://aws-bucket-addie.s3.ap-northeast-1.amazonaws.com/smartphone/architecture.png)
+![Architecture](./doc/architecture.png)
 
 ## Data Pipeline
-![Data Pipeline](https://aws-bucket-addie.s3.ap-northeast-1.amazonaws.com/smartphone/pipeline.png)
+![Data Pipeline](./doc/pipeline.png)
+
 ### Monitor
 Used Statsd to generate log records, Made Prometheus scrap records and show metrics on grafana.
-![Monitor](https://aws-bucket-addie.s3.ap-northeast-1.amazonaws.com/smartphone/grafana.png)
-
-## Database Schema
-![Database Schema](https://aws-bucket-addie.s3.ap-northeast-1.amazonaws.com/smartphone/schema.png)
 
 ## Features
 * Home page: all cellphones of different brands  
 
-![home](https://aws-bucket-addie.s3.ap-northeast-1.amazonaws.com/smartphone/home.png)
+![home](./doc/salephones-search.jpg)
 
 * Detail page:
   - Price table: show each of sale message
@@ -90,14 +87,11 @@ Used Statsd to generate log records, Made Prometheus scrap records and show metr
   - Sentiment Score: caculate sentiment score by GCP NL API
   - Comments: use GCP NL API to classify good or bad reviews  
 
-![detail](https://aws-bucket-addie.s3.ap-northeast-1.amazonaws.com/smartphone/detail.png)
+![detail](./doc/salephones-detail.jpg)
 
 * Post a sale / profile page (login required):
   - You can filled form to upload your own sale message
   - Check profile detail and past sale messages  
-
-![sale](https://aws-bucket-addie.s3.ap-northeast-1.amazonaws.com/smartphone/sale.png)
-![profile](https://aws-bucket-addie.s3.ap-northeast-1.amazonaws.com/smartphone/profile.png)
 
 
 ## Demo Account
